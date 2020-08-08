@@ -15,7 +15,7 @@ We'll also take a look at the \java{Math} class, which provides methods for comm
 \index{relational operator}
 \index{comparison operator}
 
-Java has six {\bf relational operators} that test the relationship between two values (e.g., whether they are equal, or whether one is greater than the other).
+Java has six {\bf relational operators} that compare or test the relationship between two values (e.g., whether they are equal, or whether one is greater than the other).
 The following expressions show how they are used:
 
 \begin{code}
@@ -29,7 +29,7 @@ x <= y          // x is less than or equal to y
 
 \index{Boole, George}
 
-The result of a relational operator is one of two special values: \java{true} or \java{false}.
+The result of evaluating a relational operator is one of two special values: \java{true} or \java{false}.
 These values belong to the data type \java{boolean}, named after the mathematician George Boole.
 He developed an algebraic way of representing logic.
 
@@ -40,12 +40,26 @@ He developed an algebraic way of representing logic.
 You are probably familiar with these operators, but notice how Java is different from mathematical symbols like $=$, $\neq$, and $\geq$.
 A common error is to use a single \java{=} instead of a double \java{==} when comparing values.
 Remember that \java{=} is the {\em assignment} operator, and \java{==} is a {\em relational} operator.
-In addition, the operators \java{=<} and \java{=>} do not exist.
+In addition, the operators \java{=<} and \java{=>} do not exist. Just as we say "less than or equal to", we write the two symbols of the corresponding operator in the same order.
 
 The two sides of a relational operator have to be compatible.
 For example, the expression \java{5 < "6"} is invalid because \java{5} is an \java{int} and \java{"6"} is a \java{String}.
+For now, you should only be using the relational operators with numeric types.
 When comparing values of different numeric types, Java applies the same conversion rules we saw previously with the assignment operator.
 For example, when evaluating the expression \java{5 < 6.0}, Java automatically converts the \java{5} to \java{5.0}.
+
+Since the relational operators are defined to have exactly two operands (left hand side and right hand side), you can't perform certain shortcuts that you may be used to in mathematics. For example, \java{x < y < z} is not allowed, nor is \java{x == y == z}. In fact, if your variables are boolean, Java will let you do the second one, but it won't do what you expect:
+
+\begin{code}
+boolean x = false;
+boolean y = true;
+boolean z = false;
+System.out.println(x == y == z); // prints true... why?
+\end{code}
+
+The expression \java{x == y == z} is evaluated from left to right. This means that first, \java{x == y} is evaluated. Since \java{x} and \java{y} are not equal (one is \java{false} and the other is \java{true}), this expression evaluates to \java{false}. The result of this expression will form the left hand side of the subsequent comparison, \java{false == z}, which will evaluate to \java{true} because \java{z} is also \java{false}.
+
+How do we write the correct expression? We want to see whether x, y, and z are all equal. To break it up into smaller pieces, we want to check that x equals y AND y equals z. We will see how to do this when we learn about logical operators later this chapter.
 
 %Most relational operators don't work with strings.
 %But confusingly, \java{==} and \java{!=} \emph{seem} to work with strings -- they just don't do what you expect.
@@ -442,139 +456,104 @@ if (isSingleDigit(z)) {
 Examples like this one almost read like English:
 ``If is single digit z, print ... else print ...''.
 
+\section{The Farmer Problem}
 
-\section{Validating input}
-\label{validate}
+A farmer wants to transport a wolf, a goat, and a cabbage across a river. The farmer has a boat, but it can only hold the farmer and one other thing (the farmer has to be in the boat to pilot it). If the farmer leaves the wolf and goat alone with each other, the wolf eats the goat. If the farmer leaves the goat and cabbage alone with each other, the goat eats the cabbage. Can the farmer transport all three things across the river without anything being eaten?
 
-\index{validate}
-\index{hacker}
+\subsection{Implementing the Farmer Problem's rules}
 
-One of the most important tasks in any computer program is to {\bf validate} input from the user.
-People often make mistakes while typing, especially on smartphones, and incorrect inputs may cause your program to fail.
+Solving the farmer problem is an interesting exercise. However, it's possible to ``pretend'' to solve the problem without actually solving it. For example, why not just load the boat up with all of the animals and cross the river in one move? Read the rules carefully to make sure you know why this is not allowed.
 
-Even worse, someone (i.e., a {\bf hacker}) may intentionally try to break into your system by entering unexpected inputs.
-You should never assume that users will input the right kind of data.
+If we were to play this game on a computer, it would enforce the rules of the game. The program can prevent us from making a move that violates a rule. Let's implement code which checks whether a single move is allowable based on the positions of each object before and after the move.
 
-Consider this simple program that prompts the user for a number and computes its logarithm:
+\subsection{Modeling the Farmer Problem}
+
+There are four objects: the wolf, goat, cabbage, and boat. There is also the farmer, but the farmer and boat are always in the same place, so they don't need to be considered separately. There are two sides of the river: the starting/left side, and the ending/right side. We can model the ``before'' and ``after'' positions of each object using a \java{boolean} variable, but this can be confusing. Instead, we'll model them using an \java{int} number: 1 refers to the left side and 2 refers to the right side.
+
+We'll use a concept called a {\bf transaction}. A transaction is an action that either completely succeeds or fails; it cannot partially occur. For example, suppose you want to move money from one bank account to another, which consists of debiting one account and crediting the other. If something went wrong (for example, the destination account number was invalid), you wouldn't want the money to leave one account and never appear in the other!
+
+\subsection{Defining a method}
+
+We will define a method that determines whether a move is allowable. We would only change the state of the game if the move is allowable.
 
 \begin{code}
-Scanner in = new Scanner(System.in);
-System.out.print("Enter a number: ");
-double x = in.nextDouble();
-double y = Math.log(x);
-System.out.println("The log is " + y);
+public static boolean isMoveLegal(int wolfBefore, int wolfAfter,
+                                  int goatBefore, int goatAfter,
+                                  int cabbageBefore, int cabbageAfter,
+                                  int boatBefore)
 \end{code}
 
-In mathematics, the natural logarithm (base $e$) is undefined when $x < 0$.
-If you ask for \java{Math.log(-1)}, it will return {\bf NaN} which stands for ``not a number''.
-Many users are confused when they see NaN; it often looks like a bug.
-We can use an \java{if} statement to make the output more user friendly.
+We have a list of parameter variables that represent where the goat, wolf, and cabbage begin before a move and where you want them to go after a move. For the boat, we decided not to specify an ``after'' variable because the boat always moves. Before writing the method, we should plan ahead. Start by spelling out the rules, one by one.
+
+{\bf First}, any item that is moving must move with the boat. Remember that the boat always moves with this method specification. We can write code that looks like this:
 
 \begin{code}
-if (x >= 0) {
-    double y = Math.log(x);
-    System.out.println("The log is " + y);
-} else {
-    System.out.println("The log is undefined");
+if (itemBefore != itemAfter) // replace item with goat, etc.
+\end{code}
+
+{\bf Second}, the boat can only hold one item. Recall that the farmer is combined with the boat in this representation. We can introduce a variable to count each item that moves according to the above snippet. After all items have moved, make sure that too many aren't moving
+
+\begin{code}
+int itemsMoving = 0;
+...
+if (itemBefore != itemAfter) {
+    itemsMoving = itemsMoving + 1; // One more item
+}
+...
+if (itemsMoving > 1) {
+	return false; // Too many items
 }
 \end{code}
 
-The output is better now, but there is another problem.
-What if the user doesn't enter a number at all?
-What would happen if they typed the word ``hello'', either on accident or on purpose?
-
-\index{InputMismatchException}
-\index{exception!InputMismatch}
-
-\begin{small}
-\begin{stdout}
-Exception in thread "main" java.util.InputMismatchException
-    at java.util.Scanner.throwFor(Scanner.java:864)
-    at java.util.Scanner.next(Scanner.java:1485)
-    at java.util.Scanner.nextDouble(Scanner.java:2413)
-    at Logarithm.main(Logarithm.java:8)
-\end{stdout}
-\end{small}
-
-\index{run-time error}
-\index{testing}
-
-If the user inputs a \java{String} when we expect a \java{double}, Java reports an ``input mismatch'' exception.
-We can prevent this run-time error from happening by testing the input first.
-
-The \java{Scanner} class provides \java{hasNextDouble}, which checks whether the next input can be interpreted as a \java{double}.
-If not, we can display an error message.
+{\bf Third}, we may not leave any aggressor alone (without the farmer/boat on the same side as that item) with another item that it wants to eat (aggrieved).  We should only worry about the ``after'' positions because we shouldn't allow bad moves and we shouldn't start in a bad state.
 
 \begin{code}
-if (!in.hasNextDouble()) {
-    String word = in.next();
-    System.err.println(word + "is not a number");
-    return;
-}
+if (aggressorAfter == aggrievedAfter && boatAfter != aggressorAfter)
 \end{code}
 
-\index{next!Scanner}
+If a rule is violated, we can immediately produce an error message, then bail out of the method with a false return value. This keeps with the transaction concept introduced earlier.
 
-In contrast to \java{in.nextLine}, which returns an entire line of input, the \java{in.next} method returns only the next token of input.
-We can use \java{in.next} to show the user exactly which word they typed was not a number.
-
-\index{System.err}
-
-This example also uses \java{System.err}, which is an \java{OutputStream} for error messages and warnings.
-Some development environments display output to \java{System.err} with a different color or in a separate window.
-
-\index{return}
-\index{statement!return}
-
-The \java{return} statement allows you to exit a method before you reach the end of it.
-Returning from \java{main} terminates the program.
-
-Notice the use of the \java{!} operator before \java{in.hasNextDouble()}, instead of testing the condition \java{in.hasNextDouble() == false}.
-Since \java{hasNextDouble} returns a boolean, it is already a condition.
-
-
-\section{Example program}
-
-In this chapter we have seen relational and logical operators, \java{if} statements, the \java{Math} class, and validating input.
-The following program shows how the individual code examples in the last section fit together.
-
-\index{Logarithm.java}
-
-\begin{trinket}{Logarithm.java}
-import java.util.Scanner;
-
-/**
- * Demonstrates input validation using if statements.
- */
-public class Logarithm {
-
-    public static void main(String[] args) {
-
-        // prompt for input
-        Scanner in = new Scanner(System.in);
-        System.out.print("Enter a number: ");
-
-        // check the format
-        if (!in.hasNextDouble()) {
-            String word = in.next();
-            System.err.println(word + " is not a number");
-            return;
+\begin{code}
+public static boolean isMoveLegal(int wolfBefore, int wolfAfter,
+                                 int goatBefore, int goatAfter,
+                                 int cabbageBefore, int cabbageAfter,
+                                 int boatBefore) {
+    int itemsMoving = 0; // Count the items moving (none so far)
+    if (wolfBefore != wolfAfter) {
+        // Wolf must be moving and start on the same side as the boat
+        if (wolfBefore != boatBefore) {
+            return false;
         }
-
-        // check the range
-        double x = in.nextDouble();
-        if (x >= 0) {
-            double y = Math.log(x);
-            System.out.println("The log is " + y);
-        } else {
-            System.out.println("The log is undefined");
-        }
+        itemsMoving = itemsMoving + 1; // Otherwise, one more item
     }
+    if (goatBefore != goatAfter) {
+        // Goat must be moving and start on the same side as the boat
+        if (goatBefore != boatBefore) return false;
+        itemsMoving = itemsMoving + 1; // NOT controlled by if!
+    }
+    if (cabbageBefore != cabbageAfter) {
+        // Cabbage must be moving, start on the same side as the boat
+        if (cabbageBefore != boatBefore) return false;
+        itemsMoving = itemsMoving + 1; // NOT controlled by if!
+    }
+    // If you are trying to move too many items for the boat
+    if (itemsMoving > 1) {
+        return false;
+    }
+    int boatAfter = 1; // Where the boat belongs
+    if (boatBefore == 1) boatAfter = 2;
+    // Make sure wolf doesn't eat goat
+    if (wolfAfter == goatAfter && boatAfter != wolfAfter)
+        return false; // Wolf would eat the goat
+    // Make sure goat doesn't eat cabbage
+    if (goatAfter == cabbageAfter && boatAfter != cabbageAfter)
+        return false; // Goat would eat the cabbage
+    // If we haven't bailed out, we must have passed all the rules
+    return true;
 }
-\end{trinket}
+\end{code}
 
-What started as five lines of code at the beginning of Section~\ref{validate} is now a 30-line program.
-Making programs robust (and secure) often requires a lot of additional checking, as shown in this example.
+Note that for brevity, most of our \java{if} statements are being applied to a single statement instead of a block of code.
 
 \index{comment}
 
@@ -621,15 +600,8 @@ Mathematical rules that show how to negate a logical expression.
 \term{flag}
 A variable (usually \java{boolean}) that represents a condition or status.
 
-\term{validate}
-To confirm that an input value is of the correct type and within the expected range.
-
-\term{hacker}
-A programmer who breaks into computer systems.
-The term hacker may also apply to someone who enjoys writing code.
-
-\term{NaN}
-A special floating-point value that stands for ``not a number''.
+\term{transaction}
+An action that either completely succeeds or completely fails (does not partially execute).
 
 \end{description}
 

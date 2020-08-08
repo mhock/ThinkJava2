@@ -196,7 +196,6 @@ Diagrams like this one that show the state of the program are called {\bf memory
 Each variable is represented with a box showing the name of the variable on the outside and the value inside.
 As the program runs, the state of memory changes, so memory diagrams only show a particular point in time.
 
-
 \section{Printing variables}
 \label{sec:printvar}
 
@@ -252,7 +251,6 @@ To output multiple values on the same line, it's common to use several \java{pri
 But don't forget the \java{println}!
 On many computers, the output from \java{print} is stored without being displayed until \java{println} is run; then the entire line is displayed at once.
 If you omit the \java{println}, the program might display the stored output at unexpected times or even terminate without displaying anything.
-
 
 \section{Arithmetic operators}
 
@@ -411,6 +409,53 @@ As a matter of style, you should always assign floating-point values to floating
 The compiler won't make you do it, but you never know when a simple mistake will come back and haunt you.
 
 
+\section{Literals and constants}
+\label{litconst}
+Suppose we had the following code to convert inches to centimeters:
+
+\begin{code}
+	double inch = 5; // "input variable"
+	double cm = inch * 2.54; // 2.54 centimeters per inch
+	System.out.print(inch + " in = ");
+	System.out.println(cm + " cm");
+\end{code}
+
+\index{hard coding}
+(We'll later see how we can receive input from parameters and the keyboard, but for now, the quantity is placed directly into the ``input variable'' \java{inch} in a practice called {\bf hard coding}.)
+
+\index{literal}
+A value that appears in a program, like the number 2.54, is called a {\bf literal}.
+In general, there's nothing wrong with literals.
+But when numbers like 2.54 appear in an expression with no explanation, they make the code hard to read.
+And if the same value appears many times and could change in the future, it makes the code hard to maintain.
+
+\index{magic number}
+
+Values like 2.54 are sometimes called {\bf magic numbers} (with the implication that being ``magic'' is not a good thing).
+A good practice is to assign magic numbers to variables with meaningful names, like this:
+
+\begin{code}
+	double cmPerInch = 2.54;
+	cm = inch * cmPerInch;
+\end{code}
+
+This version is easier to read and less error-prone, but it still has a problem.
+Variables can vary (hence the term), but the number of centimeters in an inch does not.
+Once we assign a value to \java{cmPerInch}, it should never change.
+Java provides the keyword \java{final}, a language feature that enforces this rule.
+
+\begin{code}
+	final double CM_PER_INCH = 2.54;
+\end{code}
+
+\index{final}
+\index{constant}
+
+Declaring that a variable is \java{final} means that it cannot be reassigned once it has been initialized.
+If you try, the compiler gives an error.
+Variables declared as \java{final} are called {\bf constants}.
+By convention, names for constants are all uppercase, with the underscore character (\java{_}) between words.
+
 \section{Rounding errors}
 
 %The operations we have seen so far -- addition, subtraction, multiplication, and division -- also work on floating-point values, although you might be interested to know that the underlying mechanism is completely different.
@@ -445,7 +490,8 @@ But on many machines, the output is:
 0.9999999999999999
 \end{stdout}
 
-The problem is that \java{0.1}, which is a terminating fraction in decimal, is a repeating fraction in binary.
+The problem is that \java{0.1}, which is a terminating fraction in decimal, is a repeating fraction in binary. (Binary can only represent sums of powers of two, but 0.1 contains a
+power of five.)
 So its floating-point representation is only approximate.
 When we add up the approximations, the rounding errors accumulate.
 
@@ -470,6 +516,115 @@ int balance = 12345;      // total number of cents
 This solution works as long as the number of cents doesn't exceed the largest integer, which is about 2 billion.
 %If necessary you can use \java{long} instead, which has a max value of $2^{63}-1$ (about 92 quadrillion dollars).
 %Hopefully nobody will ever need that much money!
+
+
+%\section{Centimeters to inches}
+\section{Type cast operators}
+
+Now suppose we have a measurement in centimeters, and we want to round it off to the nearest inch.
+It is tempting to write:
+
+\begin{code}
+	inch = cm / CM_PER_INCH;  // syntax error
+\end{code}
+
+But the result is an error -- you get something like, ``incompatible types: possible lossy conversion from double to int.''
+The problem is that the value on the right is floating-point, and the variable on the left is an integer.
+
+Java converts an \java{int} to a \java{double} automatically, since no information is lost in the process.
+On the other hand, going from \java{double} to \java{int} would lose the decimal places.
+Java doesn't perform this operation automatically in order to ensure that you are aware of the loss of the fractional part of the number.
+
+\index{type cast}
+\index{operator!cast}
+
+The simplest way to convert a floating-point value to an integer is to use a {\bf type cast}, so called because it molds or ``casts'' a value from one type to another.
+The syntax for type casting is to put the name of the type in parentheses and use it as an operator.
+
+\begin{code}
+	double pi = 3.14159;
+	int x = (int) pi;
+\end{code}
+
+The \java{(int)} operator has the effect of converting what follows into an integer.
+In this example, \java{x} gets the value \java{3}.
+Like integer division, casting to an integer always rounds toward zero, even if the fraction part is \java{0.999999} (or \java{-0.999999}).
+In other words, it simply throws away the fractional part.
+
+In order to use a cast operator, the types must be compatible.
+For example, you can't cast a \java{String} to an \java{int} because a string is not a number.
+
+\begin{code}
+	String str = "3";
+	int x = (int) str;  // error: incompatible types
+\end{code}
+
+Type casting takes precedence over arithmetic operations.
+In the following example, the value of \java{pi} gets converted to an integer before the multiplication.
+
+\begin{code}
+	double pi = 3.14159;
+	double x = (int) pi * 20.0;  // result is 60.0, not 62.0
+\end{code}
+
+%Operator precedence and integer truncation make type casting somewhat error-prone.
+
+Keeping that in mind, here's how we can convert centimeters to inches:
+
+\begin{code}
+	inch = (int) (cm / CM_PER_INCH);
+	System.out.printf("%f cm = %d in\n", cent, inch);
+\end{code}
+
+The parentheses after the cast operator require the division to happen before the type cast.
+And the result is rounded toward zero.
+We will see in the next chapter how to round floating-point numbers to the closest integer.
+
+
+\section{Remainder operator}
+
+Let's take the example one step further: suppose you have a measurement in inches and you want to convert to feet and inches.
+The goal is divide by 12 (the number of inches in a foot) and keep the remainder.
+
+\index{modulo}
+\index{\% remainder operator}
+\index{operator!remainder}
+\index{remainder}
+
+We have already seen the division operation (\java{/}), which computes the quotient of two numbers.
+If the numbers are integers, it performs integer division.
+Java also provides the {\bf modulo} operation (\java{\%}), which divides two numbers and computes the remainder.
+
+Using division and modulo, we can convert to feet and inches like this:
+
+\begin{code}
+	feet = 76 / 12;    // quotient
+	inches = 76 % 12;  // remainder
+\end{code}
+
+The first line yields 6.
+The second line, which is pronounced ``76 mod 12'', yields 4.
+So 76 inches is 6 feet, 4 inches.
+
+\index{modulus}
+
+Many people (and textbooks) incorrectly refer to \java{\%} as the ``modulus operator''.
+In mathematics, however, {\bf modulus} is the number you're dividing by.
+In the previous example, the modulus is 12.
+The Java language specification refers to  \java{\%} as the ``remainder operator''.
+
+The remainder operator looks like a percent sign, but you might find it helpful to think of it as a division sign ($\div$) rotated to the left.
+
+%Note that both \java{/} and \java{\%} perform {\em integer division}, so the result always rounds down.
+%The reason why integer division ``rounds down'' is that the hardware computes the quotient and remainder separately.
+
+\index{divisible}
+\index{extract digits}
+
+Modular arithmetic turns out to be surprisingly useful.
+For example, you can check whether one number is divisible by another: if \java{x \% y} is zero, then \java{x} is divisible by \java{y}.
+You can use remainder to ``extract'' digits from a number: \java{x \% 10} yields the rightmost digit of \java{x}, and \java{x \% 100} yields the last two digits.
+And many encryption algorithms use the remainder operator extensively.
 
 
 \section{Operators for strings}
@@ -676,6 +831,126 @@ The problem is that the first line uses \java{println}, when we probably meant t
 
 Identifying logic errors can be hard because you have to work backwards, looking at the output of the program, trying to figure out why it is doing the wrong thing, and how to make it do the right thing.
 Usually the compiler and the interpreter can't help you, since they don't know what the right thing is.
+
+\section{Optional material: Formatting output}
+
+\label{printf}
+
+When you output a \java{double} using \java{print} or \java{println}, it displays up to 16 decimal places:
+
+\begin{code}
+	System.out.print(4.0 / 3.0);
+\end{code}
+
+The result is:
+
+\begin{stdout}
+	1.3333333333333333
+\end{stdout}
+
+\index{printf}
+
+That might be more than you want.
+\java{System.out} provides another method, called \java{printf}, that gives you more control of the format.
+The ``f'' in \java{printf} stands for ``formatted''.
+Here's an example:
+
+\begin{code}
+	System.out.printf("Four thirds = %.3f", 4.0 / 3.0);
+\end{code}
+
+\index{format string}
+\index{format specifier}
+
+The first value in the parentheses is a {\bf format string} that specifies how the output should be displayed.
+This format string contains ordinary text followed by a {\bf format specifier}, which is a special sequence that starts with a percent sign.
+The format specifier \java{\%.3f} indicates that the following value should be displayed as floating-point, rounded to three decimal places.
+The result is:
+
+\begin{stdout}
+	Four thirds = 1.333
+\end{stdout}
+
+The format string can contain any number of format specifiers; here's an example with two of them:
+
+\begin{code}
+	int inch = 100;
+	double cm = inch * CM_PER_INCH;
+	System.out.printf("%d in = %f cm\n", inch, cm);
+\end{code}
+
+The result is:
+
+\begin{stdout}
+	100 in = 254.000000 cm
+\end{stdout}
+
+Like \java{print}, \java{printf} does not append a newline.
+So format strings often end with a newline character.
+
+The format specifier \java{\%d} displays integer values (``d'' stands for ``decimal'', not double).
+The values are matched up with the format specifiers in order, so \java{inch} is displayed using \java{\%d}, and \java{cm} is displayed using \java{\%f}.
+
+Learning about format strings is like learning a sub-language within Java.
+There are many options, and the details can be overwhelming.
+Table~\ref{tab:format} lists a few common uses, to give you an idea of how things work.
+
+\begin{table}[!ht]
+	\begin{center}
+		\begin{tabular}{|l|l|l|}
+			\hline
+			\java{\%d} & decimal integer & 12345 \\
+			\hline
+			%\java{\%,d} & decimal integer with comma separators & 12,345 \\
+			%\hline
+			\java{\%08d} & padded with zeros, at least 8 digits wide & 00012345 \\
+			\hline
+			\java{\%f} & floating-point & 6.789000 \\
+			\hline
+			\java{\%.2f} & rounded to 2 decimal places & 6.79 \\
+			\hline
+			\java{\%s} & string of characters & \java{"Hello"} \\
+			\hline
+		\end{tabular}
+		\caption{Example format specifiers}
+		\label{tab:format}
+	\end{center}
+\end{table}
+
+For more details, refer to the documentation of \java{java.util.Formatter}.
+The easiest way to find documentation for Java classes is to do a web search for ``Java'' and the name of the class.
+
+In contrast to \java{print} and \java{println}, \java{printf} uses commas to separate each value.
+The following line accidentally {\em concatenates} \java{inch} and \java{cm} to the format string, rather than substitute them:
+
+\begin{code}
+	System.out.printf("%d in = %f cm\n" + inch + cm);  // error
+\end{code}
+
+Unfortunately the compiler won't catch this kind of bug, because it's within a legal Java statement.
+However when you run the program, it will display:
+
+\index{MissingFormatArgumentException}
+\index{exception!MissingFormatArgument}
+
+\begin{small}
+	\begin{stdout}
+		Exception in thread "main" java.util.MissingFormatArgumentException:
+		Format specifier '%d'
+		at java.util.Formatter.format(Formatter.java:2519)
+		at java.io.PrintStream.format(PrintStream.java:970)
+		at java.io.PrintStream.printf(PrintStream.java:871)
+		at Example.main(Example.java:10)
+	\end{stdout}
+\end{small}
+
+Error messages may seem cryptic, but it's important to read them carefully.
+Starting from the top, this one says ``missing format argument'' and ``format specifier \%d''.
+In order words, it doesn't know what value to substitute for the \%d.
+The bottom of the error indicates where to look: Example.java line 10.
+
+It might be difficult to see what's wrong, given that \java{inch} and \java{cm} are at the end of the \java{printf} statement.
+But if \java{inch} is 1 and \java{cm} is 2.54, the actual format string would be \java{"\%d in = \%f cm\\n12.54"}.
 
 
 \section{Vocabulary}

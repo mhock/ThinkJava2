@@ -353,102 +353,9 @@ If you try to follow the flow of execution here, even for small values of \java{
 But if we take a leap of faith and assume that the two recursive invocations work correctly, then it is clear, looking at the definition, that our implementation is correct.
 
 
-\section{Binary number system}
-
-Before introducing the next recursive example, we need to discuss how integers are represented by a computer.
-
-You are probably aware that computers can only store 1's and 0's.
-That's because, at the end of the day, processors and memory are made up of billions of tiny on-off switches.
-
-The value 1 means a switch is on; the value 0 means a switch is off.
-All types of data, whether integer, floating-point, text, audio, video, or something else, need to be represented by 1's and 0's.
-
-\index{binary}
-
-Fortunately, mathematicians solved this problem centuries ago.
-We can represent any integer as a {\bf binary} number.
-The following table shows the first eight numbers in binary and decimal (the number system we normally use).
-
-\begin{table}[!ht]
-\begin{center}
-\begin{tabular}{|c|c|}
-\hline
-Binary & Decimal \\
-\hline
-0 & 0 \\
-\hline
-1 & 1 \\
-\hline
-10 & 2 \\
-\hline
-11 & 3 \\
-\hline
-100 & 4 \\
-\hline
-101 & 5 \\
-\hline
-110 & 6 \\
-\hline
-111 & 7 \\
-\hline
-\end{tabular}
-\caption{The first eight binary numbers.}
-\label{tab:binary}
-\end{center}
-\end{table}
-
-In the decimal system, each part of a number is referred to as a ``digit''.
-For example, the number 456 has three digits.
-In the binary system, each part of a number is referred to as a ``bit''.
-The number 10111 in binary has five bits.
-
-When you hear the phrase ``64-bit computer'', it means that the processors and memory use 64 bits to store integers.
-That is where the limits for data types like \java{int} and \java{long} come from.
-
-Decimal numbers are based on powers of 10, because there are 10 possible values for each digit.
-For example, the number 456 has 6 in the 1's place, 5 in the 10's place, and 4 in the 100's place.
-So the value is 400 + 50 + 6.
-
-\begin{center}
-\begin{tabular}{|c|c|c|}
-\hline
-4 & 5 & 6 \\
-\hline
-$10^2$ & $10^1$ & $10^0$ \\
-\hline
-\end{tabular}
-\end{center}
-
-Binary numbers are based on powers of 2, because there are 2 possible values for each bit.
-For example, the number 10111 has 1 in the 1's place, 1 in the 2's place, 1 in the 4's place, 0 in the 8's place, and 1 in the 16's place.
-So the value is 16 + 0 + 4 + 2 + 1, which is 23 in decimal.
-
-\begin{center}
-\begin{tabular}{|c|c|c|c|c|}
-\hline
-1 & 0 & 1 & 1 & 1 \\
-\hline
-$2^4$ & $2^3$ & $2^2$ & $2^1$ & $2^0$ \\
-\hline
-\end{tabular}
-\end{center}
-
-To convert from decimal to binary, we simply need to divide the number by two repeatedly until we reach zero.
-When you divide by two, the remainder will be either 0 or 1.
-If you keep track of the remainders, you'll have your binary number.
-
-\begin{stdout}
-23 / 2 is 11 remainder 1
-11 / 2 is  5 remainder 1
- 5 / 2 is  2 remainder 1
- 2 / 2 is  1 remainder 0
- 1 / 2 is  0 remainder 1
-\end{stdout}
-
-Reading these remainders from bottom to top, 23 in binary is 10111.
-
-
 \section{Recursive binary method}
+
+You may want to review Section~\ref{binary} (binary numbers) before continuing.
 
 We can write a recursive method to convert decimal to binary.
 Doing so will demonstrate how to compute results in reverse order.
@@ -875,12 +782,12 @@ eeffoc
 
 \index{palindrome}
 
-\item A palindrome is a word that reads the same both forward and backward, like ``otto'' and ``palindromeemordnilap''.
+\item A palindrome is a word that reads the same both forward and backward, like ``otto'' and ``racecar''.
 Here's one way to test whether a string is a palindrome:
 
 \begin{quotation}
 \noindent
-A single letter is a palindrome, a two-letter word is a palindrome if the letters are the same, and any other word is a palindrome if the first letter is the same as the last and the middle is a palindrome.
+A zero length string (also known as \java{""}) or single letter (such as \java{"a"}) is a palindrome, and any other word is a palindrome if the first letter is the same as the last and the rest is a palindrome.
 \end{quotation}
 
 Write a recursive method named \java{isPalindrome} that takes a \java{String} and returns a \java{boolean} indicating whether the word is a palindrome.

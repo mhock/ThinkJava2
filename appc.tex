@@ -153,57 +153,6 @@ canvas.setBackground(Color.white);
 \end{code}
 
 
-\section{Example drawing}
-
-\index{Mickey Mouse}
-
-Suppose we want to draw a ``Hidden Mickey'', which is an icon that represents Mickey Mouse (see \url{https://en.wikipedia.org/wiki/Hidden_Mickey}).
-We can use the oval we just drew as the face, and then add two ears.
-To make the code more readable, let's use \java{Rectangle} objects to represent bounding boxes.
-
-Here's a method that takes a \java{Rectangle} and invokes \java{fillOval}:
-
-\begin{code}
-public void boxOval(Graphics g, Rectangle bb) {
-    g.fillOval(bb.x, bb.y, bb.width, bb.height);
-}
-\end{code}
-
-And here's a method that draws Mickey Mouse:
-
-\begin{code}
-public void mickey(Graphics g, Rectangle bb) {
-    boxOval(g, bb);
-
-    int dx = bb.width / 2;
-    int dy = bb.height / 2;
-    Rectangle half = new Rectangle(bb.x, bb.y, dx, dy);
-
-    half.translate(-dx / 2, -dy / 2);
-    boxOval(g, half);
-
-    half.translate(dx * 2, 0);
-    boxOval(g, half);
-}
-\end{code}
-
-The first line draws the face.
-The next three lines create a smaller rectangle for the ears.
-We \java{translate} the rectangle up and left for the first ear, then to the right for the second ear.
-The result is shown in Figure~\ref{fig.mickey}.
-
-\begin{figure}[!ht]
-\begin{center}
-\includegraphics[height=2in]{figs/mickey.png}
-\caption{A ``Hidden Mickey'' drawn using Java graphics.}
-\label{fig.mickey}
-\end{center}
-\end{figure}
-
-You can read more about \java{Rectangle} and \java{translate} in Chapter~\ref{mutable}.
-See the exercises at the end of this appendix for more example drawings.
-
-
 \section{Vocabulary}
 
 \begin{description}
@@ -236,23 +185,6 @@ Before you start the exercises, we recommend that you compile and run the exampl
 \begin{exercise}
 
 Draw the flag of Japan: a red circle on a white background that is wider than it is tall.
-
-\end{exercise}
-
-
-\begin{exercise}
-
-Modify {\tt Mickey.java} to draw ears on the ears, and ears on those ears, and more ears all the way down until the smallest ears are only 3 pixels wide.
-The result should look like ``Mickey Moose'', shown in Figure~\ref{fig.moose}.
-{\it Hint:} You should only have to add or modify a few lines of code.
-
-\begin{figure}[!ht]
-\begin{center}
-\includegraphics[height=2in]{figs/moose.png}
-\caption{A recursive shape we call ``Mickey Moose''.}
-\label{fig.moose}
-\end{center}
-\end{figure}
 
 \end{exercise}
 

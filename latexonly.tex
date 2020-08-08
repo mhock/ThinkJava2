@@ -75,22 +75,24 @@
 % colors for code listings and output
 \usepackage{xcolor}
 \definecolor{bgcolor}{HTML}{FAFAFA}
-\definecolor{comment}{HTML}{007C00}
-\definecolor{keyword}{HTML}{0000FF}
-\definecolor{strings}{HTML}{B20000}
+\definecolor{comment}{HTML}{2F7F5F}
+\definecolor{keyword}{HTML}{7F0055}
+\definecolor{strings}{HTML}{0000FF}
 
 % syntax highlighting in code listings
 \usepackage{textcomp}
 \usepackage{listings}
 \lstset{
     language=java,
+    tabsize=4,
     basicstyle=\ttfamily,
     backgroundcolor=\color{bgcolor},
     commentstyle=\color{comment},
-    keywordstyle=\color{keyword},
+    keywordstyle=\color{keyword}\bfseries,
     stringstyle=\color{strings},
     columns=fullflexible,
-    emph={label},  % keyword?
+    emph={keyword,label},  % was label
+    emphstyle=\bfseries,
     keepspaces=true,
     showstringspaces=false,
     upquote=true,

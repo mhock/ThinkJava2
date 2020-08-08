@@ -6,15 +6,17 @@
 \newcommand{\thetitle}{Think Java}
 \newcommand{\thesubtitle}{How to Think Like a Computer Scientist}
 \newcommand{\theauthors}{Allen B. Downey and Chris Mayfield}
-\newcommand{\theversion}{6.6.0}
+\newcommand{\theversion}{6.6.0e CS 142 Summer 2019 edition}
 
 %%%% Both LATEX and PLASTEX
 
 \usepackage{graphicx}
 \usepackage{setspace}
+\usepackage[varqu]{inconsolata}
 
 %BEGIN LATEX
 \usepackage{comment}
+\usepackage{pstricks}
 \excludecomment{htmlonly}
 \includecomment{latexonly}
 
@@ -137,6 +139,8 @@ Version \theversion
 
 {\Large \theauthors}
 
+{\Large with a few changes by Martin Hock}
+
 \vspace{0.5in}
 
 {\Large Green Tea Press}
@@ -152,6 +156,8 @@ Version \theversion
 
 Copyright \copyright ~2017 \theauthors.
 
+Additional modifications \copyright ~2018-2019 Martin Hock.
+
 \vspace{0.2in}
 
 \begin{flushleft}
@@ -165,7 +171,7 @@ Permission is granted to copy, distribute, and/or modify this work under the ter
 The original form of this book is \LaTeX\ source code.
 Compiling this code has the effect of generating a device-independent representation of the book, which can be converted to other formats and printed.
 
-The \LaTeX\ source for this book is available from \url{http://thinkjava.org/} and \url{https://github.com/ChrisMayfield/ThinkJava2}.
+The original \LaTeX\ source for this book is available from \url{http://thinkjava.org/} and \url{https://github.com/ChrisMayfield/ThinkJava2}. Modifications have been made by Martin Hock.
 
 %--table of contents------------------------------------------
 
@@ -191,6 +197,8 @@ Version \theversion
 
 Copyright \copyright ~2017 \theauthors.
 
+Additional modifications \copyright ~2018-2019 Martin Hock.
+
 Permission is granted to copy, distribute, and/or modify this work under the terms of the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License, which is available at \url{https://creativecommons.org/licenses/by-nc-sa/4.0/}.
 
 \vspace{1em}
@@ -210,8 +218,6 @@ Permission is granted to copy, distribute, and/or modify this work under the ter
 
 \input{ch02.tex}
 
-\input{ch03.tex}
-
 \input{ch04.tex}
 
 \input{ch05.tex}
@@ -220,7 +226,7 @@ Permission is granted to copy, distribute, and/or modify this work under the ter
 
 \input{ch07.tex}
 
-\input{ch08.tex}
+\input{ch03.tex} % scanners, formatting, etc.
 
 \input{ch09.tex}
 
@@ -251,6 +257,8 @@ Permission is granted to copy, distribute, and/or modify this work under the ter
 
 \input{appe.tex}
 
+\input{ch08.tex} % recursion
+
 \backmatter
 
 \printindex
@@ -271,5 +279,7 @@ He has a Ph.D. in Computer Science from U.C. Berkeley and Master's and Bachelor'
 
 {\bf Chris Mayfield} is an Associate Professor of Computer Science at James Madison University, with a research focus on CS education and professional development.
 He has a Ph.D. in Computer Science from Purdue University and Bachelor's degrees in CS and German from the University of Utah.
+
+{\bf Martin Hock} made some stylistic changes and added a few examples; the bulk of the text is by the other authors.
 
 \end{document}

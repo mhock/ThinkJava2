@@ -13,10 +13,25 @@ An important skill for a computer scientist is {\bf problem solving}.
 It involves the ability to formulate problems, think creatively about solutions, and express solutions clearly and accurately.
 As it turns out, the process of learning to program computers is an excellent opportunity to develop problem-solving skills.
 %That's why this chapter is called, ``The way of the program''.
-On one level you will be learning to write Java programs, a useful skill by itself.
+On one level you will be learning to write Java programs, also known as {\bf programming} or {\bf coding}, a useful skill by itself.
 But on another level you will use programming as a means to an end.
 As we go along, that end will become clearer.
 
+\section{A first example of computation}
+
+Learning how to code can be a daunting task. To start things off, we'll give a slightly complex example of computation in the form of a flowchart on the next page to whet your appetite. The example doesn't make use of Java's vocabulary, or {\bf syntax}, but it makes use of some of its behavior, or {\bf semantics}.
+
+\begin{figure}[!ht]
+	\begin{center}
+		\includegraphics[width=4in]{figs/flowcharta.pdf}
+	\end{center}
+\end{figure}
+
+
+\index{flowchart}
+It's worth pausing and understanding this example; the following paragraph provides some explanation. In programming languages, variables store information. In the example, the variables $x$, $y$, and $n$ store numeric information, or values. A variable can be modified or evaluated. A variable can ``become'' a different value which is the result of a calculation. The calculation may refer to the variable being modified as well as other variables or numbers. A calculation that evaluates (refers to) a variable being modified takes on the value of the variable {\em before} it is modified. See if you can follow the flow step-by-step from start to end and figure out the output for each of the four examples. As you follow each step, make sure you keep track of where you are and the current variable values. A pencil with an eraser may help!
+
+After the first couple of examples, you may be able to figure out what the program is accomplishing and you may not need to simulate each step. Be careful, though, as your understanding may not be correct! For example, what will be output if the inputs are 7, -9?
 
 \section{What is a computer?}
 
@@ -26,6 +41,8 @@ However, in a more general sense, a computer can be any type of device that stor
 
 \href{http://www.dictionary.com/browse/computer}{\tt Dictionary.com} defines a computer as ``a programmable electronic device designed to accept data, perform prescribed mathematical and logical operations at high speed, and display the results of these operations.
 Mainframes, desktop and laptop computers, tablets, and smartphones are some of the different types of computers.''
+
+Originally (beginning in the 17th century), ``computer'' referred to a {\em person} who performed computations.
 
 \index{hardware}
 \index{processor}
@@ -50,7 +67,103 @@ Figure~\ref{fig.cpuram} shows what these components look like.
 \end{figure}
 
 Users generally see and interact with touchscreens, keyboards, and monitors, but it's the processors and memory that perform the actual computation.
-Nowadays it's fairly standard, even for a smartphone, to have at least eight processors and four gigabytes (four billion cells) of memory.
+Nowadays it's fairly standard, even for a smartphone, to have multiple processors (cores) and gigabytes (billions of bytes) of memory. (We'll define a byte soon!)
+
+\section{Binary number system}
+
+\index{binary numbers}
+\label{binary}
+
+You are probably aware that computers can only store 1's and 0's.
+That's because, at the end of the day, processors and memory are made up of billions of tiny on-off switches.
+
+The value 1 means a switch is on; the value 0 means a switch is off.
+All types of data, whether integer, floating-point, text, audio, video, or something else, need to be represented by 1's and 0's.
+
+\index{binary}
+
+Fortunately, mathematicians solved this problem centuries ago.
+We can represent any integer as a {\bf binary} number.
+The following table shows the first eight numbers in binary and decimal (the number system we normally use).
+
+\begin{table}[!ht]
+	\begin{center}
+		\begin{tabular}{|c|c|}
+			\hline
+			Binary & Decimal \\
+			\hline
+			0 & 0 \\
+			\hline
+			1 & 1 \\
+			\hline
+			10 & 2 \\
+			\hline
+			11 & 3 \\
+			\hline
+			100 & 4 \\
+			\hline
+			101 & 5 \\
+			\hline
+			110 & 6 \\
+			\hline
+			111 & 7 \\
+			\hline
+		\end{tabular}
+		\caption{The first eight binary numbers.}
+		\label{tab:binary}
+	\end{center}
+\end{table}
+
+In the decimal system, each part of a number is referred to as a ``digit''.
+For example, the number 456 has three digits.
+In the binary system, each part of a number is referred to as a ``bit''.
+The number 10111 in binary has five bits.
+A group of 8 bits is referred to as a ``byte''. Computers normally access memory in groups of bytes.
+
+When you hear the phrase ``64-bit computer'', it means that the processors and memory use 64 bits (8 bytes) to store integers.
+
+Decimal numbers are based on powers of 10, because there are 10 possible values for each digit.
+For example, the number 456 has 6 in the 1's place, 5 in the 10's place, and 4 in the 100's place.
+So the value is 400 + 50 + 6.
+
+\begin{center}
+	\begin{tabular}{|c|c|c|}
+		\hline
+		4 & 5 & 6 \\
+		\hline
+		$10^2$ & $10^1$ & $10^0$ \\
+		\hline
+	\end{tabular}
+\end{center}
+
+Binary numbers are based on powers of 2, because there are 2 possible values for each bit.
+For example, the number 10111 has 1 in the 1's place, 1 in the 2's place, 1 in the 4's place, 0 in the 8's place, and 1 in the 16's place.
+So the value is 16 + 0 + 4 + 2 + 1, which is 23 in decimal.
+
+\begin{center}
+	\begin{tabular}{|c|c|c|c|c|}
+		\hline
+		1 & 0 & 1 & 1 & 1 \\
+		\hline
+		$2^4$ & $2^3$ & $2^2$ & $2^1$ & $2^0$ \\
+		\hline
+	\end{tabular}
+\end{center}
+
+To convert from decimal to binary, we simply need to divide the number by two repeatedly until we reach zero.
+When you divide by two, the remainder will be either 0 or 1.
+If you keep track of the remainders, you'll have your binary number.
+
+\begin{stdout}
+	23 / 2 is 11 remainder 1
+	11 / 2 is  5 remainder 1
+	 5 / 2 is  2 remainder 1
+	 2 / 2 is  1 remainder 0
+	 1 / 2 is  0 remainder 1
+\end{stdout}
+
+Reading these remainders from bottom to top, 23 in binary is 10111.
+
 
 
 \section{What is programming?}
@@ -450,12 +563,6 @@ She said "Hello!" to me.
 
 \section{What is computer science?}
 
-This book intentionally omits some details about the Java language (such as the other escape sequences), because our main goal is learning how to think like a computer scientist.
-Being able to understand computation is much more valuable than just learning how to write code.
-
-If you're interested in learning more about Java itself, Oracle maintains an official set of tutorials on their website: \url{https://docs.oracle.com/javase/tutorial/}.
-The ``Language Basics'' tutorial (found under ``Learning the Java Language'') is a good place to start.
-
 One of the most interesting aspects of writing programs is deciding how to solve a particular problem, especially when there are multiple solutions.
 For example, there are numerous ways to sort a list of numbers, and each way has its advantages.
 %\href{https://www.toptal.com/developers/sorting-algorithms/}{\tt Sorting-algorithms.com} provides animations and descriptions for eight of the most common ways.
@@ -466,14 +573,33 @@ In order to determine which way is best for a given situation, we need technique
 
 An {\bf algorithm} is a sequence of steps that specifies how to solve a problem.
 Some algorithms are faster than others, and some use less space in computer memory.
-{\bf Computer science} is the science of algorithms, including their discovery and analysis.
+Consider the earlier flowchart example. To multiply 7 by 9, we would perform 9 additions of the number 7. In grade school however, you may have memorized a times table of all single digit decimal numbers. Consulting a table is much faster than performing 7 manual operations. Now consider multiplying 7 by 1000. Actually, this problem is really easy: just multiply 7 by 1 and put 3 zeros onto the end. But the procedure we gave would perform all thousand multiplications. Consider the revised version on the next page. Does it work? How much faster is it?
+
+\begin{figure}[!ht]
+	\begin{center}
+		\includegraphics[width=4in]{figs/flowchartb.pdf}
+	\end{center}
+\end{figure}
+
+
+{\bf Computer science} is the science of algorithms, including their discovery and analysis, as well as proofs of what can and cannot be accomplished by certain classes of algorithms. In math, you can't divide by 0 or find the last digit of $\pi$, and in physics you can't travel faster than light. Similarly, computers have rules, some of which are axiomatic (disallowing division by 0 is part of the rules of math) and others which are discovered by experiment or mathematical proof (thousands of years elapsed between defining $\pi$ and proving its irrationality).
 As you learn to develop algorithms for problems you haven't solved before, you will learn to think like a computer scientist.
 %It's much more fun to discover new algorithms than to write the code for solutions that other people came up with!
+
+\index{computational thinking}
+Keep in mind that the job of your program is to tell the computer how to accomplish a task in a step-by-step way. Because Java is broken up into simple, unambiguous building blocks, in this way you will produce a solution that cannot be misinterpreted. The ability to formulate this solution and convey it in an unambiguous way is called {\bf computational thinking}. Java is one example of a formal system that computers can interpret.
+
+This book intentionally omits some details about the Java language (such as the other escape sequences), because our main goal is learning how to think like a computer scientist.
+Being able to understand computation is much more valuable than just learning how to write code.
+
+\index{Java tutorial}
+If you're interested in learning more about Java itself, Oracle maintains an official set of tutorials on their website: \url{https://docs.oracle.com/javase/tutorial/}.
+The ``Language Basics'' tutorial (found under ``Learning the Java Language'') is a good place to start.
 
 \index{bug}
 \index{debugging}
 
-Designing algorithms and writing code is difficult and error-prone.
+Even the simplest Java program uses a huge amount of vocabulary and it can be easy to become overwhelmed. Don't panic! Designing algorithms and writing code is difficult and error-prone.
 For historical reasons, programming errors are called {\bf bugs}, and the process of tracking them down and correcting them is called {\bf debugging}.
 As you learn to debug your programs, you will develop new problem-solving skills.
 You will need to think creatively when unexpected errors happen.

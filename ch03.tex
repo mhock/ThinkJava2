@@ -1,9 +1,89 @@
-\chapter{Input and output}
+\chapter{Keyboard input and interaction}
 
-The programs we've looked at so far simply display messages, which doesn't really involve that much computation.
-This chapter will show you how to read input from the keyboard, use that input to calculate a result, and then format that result for output.
+Although our programs have gotten progressively more complicated, they have not been interactive in any way. This chapter will show you how to read input from the keyboard, use that input to calculate a result, and then format that result for output. We'll also take a first look at \java{String} methods and solve some interesting problems.
+
 %We will also look at some technical details about how operating systems work.
 
+
+\section{Characters}
+
+Some of the most interesting problems in computer science involve searching and manipulating text.
+In the next few sections, we'll discuss how to apply loops to strings.
+Although the examples are short, the techniques work the same whether you have one word or one million words.
+
+\index{charAt}
+\index{char}
+\index{type!char}
+
+Strings provide a method named \java{charAt}.
+It returns a \java{char}, a data type that stores an individual character (as opposed to strings of them).
+
+\begin{code}
+	String fruit = "banana";
+	char letter = fruit.charAt(0);
+\end{code}
+
+The argument \java{0} means that we want the character at {\bf index} 0.
+String indexes range from 0 to $n-1$, where $n$ is the length of the string.
+So the character assigned to \java{letter} is \java{b}.
+
+\begin{center}
+	\ttfamily
+	\begin{tabular}{cccccc}
+		\hline
+		\multicolumn{1}{|l|}{b} & \multicolumn{1}{l|}{a} & \multicolumn{1}{l|}{n} & \multicolumn{1}{l|}{a} & \multicolumn{1}{l|}{n} & \multicolumn{1}{l|}{a} \\ \hline
+		0                       & 1                      & 2                      & 3                      & 4                      & 5
+	\end{tabular}
+\end{center}
+
+
+Characters work like the other data types we have seen.
+You can compare them using relational operators:
+
+\begin{code}
+	if (letter == 'a') {
+		System.out.println('?');
+	}
+\end{code}
+
+\index{quote mark}
+\index{escape sequence}
+
+Character literals, like \java{'a'}, appear in single quotes.
+Unlike string literals, which appear in double quotes, character literals can only contain a single character.
+Escape sequences, like \java{'\\t'}, are legal because they represent a single character.
+
+The increment and decrement operators also work with characters.
+So this loop displays the letters of the alphabet:
+
+\begin{code}
+	System.out.print("Roman alphabet: ");
+	for (char c = 'A'; c <= 'Z'; c++) {
+		System.out.print(c);
+	}
+	System.out.println();
+\end{code}
+
+\index{Unicode}
+
+Java uses {\bf Unicode} to represent characters, so strings can store text in other alphabets like Cyrillic and Greek, and non-alphabetic languages like Chinese.
+You can read more about it at \url{http://unicode.org/}.
+
+In Unicode, each character is represented by a ``code point'', which you can think of as an integer.
+The code points for uppercase Greek letters run from 913 to 937, so we can display the Greek alphabet like this:
+
+\begin{code}
+	System.out.print("Greek alphabet: ");
+	for (int i = 913; i <= 937; i++) {
+		System.out.print((char) i);
+	}
+	System.out.println();
+\end{code}
+
+This example uses a type cast to convert each integer (in the range) to the corresponding character.
+Try running the code and see what happens.
+
+Most Unicode characters require only one code point, but emoji and some others require multiple code points, meaning they can't be stored in a single \java{char}. In addition, some characters can be represented in more than one way. For example, \'a (lowercase a with acute accent) can be encoded as code point 225, or as the sequence 97 (lowercase a) followed by 769 (acute accent). Both encodings will draw the same visual representation \'a.
 
 \section{The System class}
 
@@ -36,10 +116,9 @@ A {\bf package} is a collection of related classes; \java{java.io} contains clas
 \index{address}
 \index{hexadecimal}
 
-The numbers and letters after the {\tt @} sign are the {\bf address} of \java{System.out}, represented as a hexadecimal (base 16) number.
-The address of a value is its location in the computer's memory, which might be different on different computers.
-In this example the address is \java{685d72cd}, but if you run the same code you will likely get something else.
-%You can think of the address as a unique identifier for the object.
+The numbers and letters after the {\tt @} sign are the {\bf hash code} of \java{System.out}, represented as a hexadecimal (base 16) number.
+The hash code is related to the memory location where the object is being stored.
+In this example the hash code is \java{685d72cd}, but if you run the same code you will likely get something else.
 
 \index{library}
 
@@ -177,331 +256,9 @@ The standard edition of Java comes with {\em several thousand} classes you can u
 You can browse this library at \url{http://docs.oracle.com/javase/8/docs/api/}.
 Interestingly, most of the Java library is written in Java.
 
+\section{Unit conversion revisited}
 
-%\section{Inches to centimeters}
-\section{Literals and constants}
-
-%Now let's work through an example that's a little more useful.
-Although most of the world has adopted the metric system for weights and measures, some countries are stuck with Imperial units.
-For example, when talking with friends in Europe about the weather, people in the United States might have to convert from Celsius to Fahrenheit and back.
-%And when making an international purchase online, you may have to convert your nation's currency into another based on the exchange rate.
-Or they might want to convert height in inches to centimeters.
-
-%An everyday problem that computers are great at solving is converting numbers from one unit into another.
-%For the rest of the chapter, we will look at how to write programs that solve these types of problems.
-%Specifically, each program will 1) prompt the user for input, 2) read input from the keyboard, 3) calculate a result, and 4) format the result for output.
-%The focus will not only be on Java syntax and language features, but also on the {\em process} of solving the problem, documenting the code, and testing the solution.
-
-We can write a program to help.
-We'll use a \java{Scanner} to input a measurement in inches, convert to centimeters, and then display the results.
-The following lines declare the variables and create the \java{Scanner}:
-
-\begin{code}
-int inch;
-double cm;
-Scanner in = new Scanner(System.in);
-\end{code}
-
-\index{prompt}
-\index{nextInt!Scanner}
-
-The next step is to prompt the user for the input.
-We'll use \java{print} instead of \java{println} so they can enter the input on the same line as the {\bf prompt}.
-And we'll use the \java{Scanner} method \java{nextInt}, which reads input from the keyboard and converts it to an integer:
-
-\begin{code}
-System.out.print("How many inches? ");
-inch = in.nextInt();
-\end{code}
-
-Next we multiply the number of inches by 2.54, since that's how many centimeters there are per inch, and display the results:
-
-\begin{code}
-cm = inch * 2.54;
-System.out.print(inch + " in = ");
-System.out.println(cm + " cm");
-\end{code}
-
-This code works correctly, but it has a minor problem.
-If another programmer reads this code, they might wonder where 2.54 comes from.
-For the benefit of others (and yourself in the future), it would be better to assign this value to a variable with a meaningful name.
-%We'll demonstrate in the next section.
-
-
-%\section{Literals and constants}
-
-\index{literal}
-
-A value that appears in a program, like the number 2.54, is called a {\bf literal}.
-In general, there's nothing wrong with literals.
-But when numbers like 2.54 appear in an expression with no explanation, they make the code hard to read.
-And if the same value appears many times and could change in the future, it makes the code hard to maintain.
-
-\index{magic number}
-
-Values like 2.54 are sometimes called {\bf magic numbers} (with the implication that being ``magic'' is not a good thing).
-A good practice is to assign magic numbers to variables with meaningful names, like this:
-
-\begin{code}
-double cmPerInch = 2.54;
-cm = inch * cmPerInch;
-\end{code}
-
-This version is easier to read and less error-prone, but it still has a problem.
-Variables can vary (hence the term), but the number of centimeters in an inch does not.
-Once we assign a value to \java{cmPerInch}, it should never change.
-Java provides the keyword \java{final}, a language feature that enforces this rule.
-
-\begin{code}
-final double CM_PER_INCH = 2.54;
-\end{code}
-
-\index{final}
-\index{constant}
-
-Declaring that a variable is \java{final} means that it cannot be reassigned once it has been initialized.
-If you try, the compiler gives an error.
-Variables declared as \java{final} are called {\bf constants}.
-By convention, names for constants are all uppercase, with the underscore character (\java{_}) between words.
-
-
-\section{Formatting output}
-\label{printf}
-
-When you output a \java{double} using \java{print} or \java{println}, it displays up to 16 decimal places:
-
-\begin{code}
-System.out.print(4.0 / 3.0);
-\end{code}
-
-The result is:
-
-\begin{stdout}
-1.3333333333333333
-\end{stdout}
-
-\index{printf}
-
-That might be more than you want.
-\java{System.out} provides another method, called \java{printf}, that gives you more control of the format.
-The ``f'' in \java{printf} stands for ``formatted''.
-Here's an example:
-
-\begin{code}
-System.out.printf("Four thirds = %.3f", 4.0 / 3.0);
-\end{code}
-
-\index{format string}
-\index{format specifier}
-
-The first value in the parentheses is a {\bf format string} that specifies how the output should be displayed.
-This format string contains ordinary text followed by a {\bf format specifier}, which is a special sequence that starts with a percent sign.
-The format specifier \java{\%.3f} indicates that the following value should be displayed as floating-point, rounded to three decimal places.
-The result is:
-
-\begin{stdout}
-Four thirds = 1.333
-\end{stdout}
-
-The format string can contain any number of format specifiers; here's an example with two of them:
-
-\begin{code}
-int inch = 100;
-double cm = inch * CM_PER_INCH;
-System.out.printf("%d in = %f cm\n", inch, cm);
-\end{code}
-
-The result is:
-
-\begin{stdout}
-100 in = 254.000000 cm
-\end{stdout}
-
-Like \java{print}, \java{printf} does not append a newline.
-So format strings often end with a newline character.
-
-The format specifier \java{\%d} displays integer values (``d'' stands for ``decimal'', not double).
-The values are matched up with the format specifiers in order, so \java{inch} is displayed using \java{\%d}, and \java{cm} is displayed using \java{\%f}.
-
-Learning about format strings is like learning a sub-language within Java.
-There are many options, and the details can be overwhelming.
-Table~\ref{tab:format} lists a few common uses, to give you an idea of how things work.
-
-\begin{table}[!ht]
-\begin{center}
-\begin{tabular}{|l|l|l|}
-\hline
-\java{\%d} & decimal integer & 12345 \\
-\hline
-%\java{\%,d} & decimal integer with comma separators & 12,345 \\
-%\hline
-\java{\%08d} & padded with zeros, at least 8 digits wide & 00012345 \\
-\hline
-\java{\%f} & floating-point & 6.789000 \\
-\hline
-\java{\%.2f} & rounded to 2 decimal places & 6.79 \\
-\hline
-\java{\%s} & string of characters & \java{"Hello"} \\
-\hline
-\end{tabular}
-\caption{Example format specifiers}
-\label{tab:format}
-\end{center}
-\end{table}
-
-For more details, refer to the documentation of \java{java.util.Formatter}.
-The easiest way to find documentation for Java classes is to do a web search for ``Java'' and the name of the class.
-
-In contrast to \java{print} and \java{println}, \java{printf} uses commas to separate each value.
-The following line accidentally {\em concatenates} \java{inch} and \java{cm} to the format string, rather than substitute them:
-
-\begin{code}
-System.out.printf("%d in = %f cm\n" + inch + cm);  // error
-\end{code}
-
-Unfortunately the compiler won't catch this kind of bug, because it's within a legal Java statement.
-However when you run the program, it will display:
-
-\index{MissingFormatArgumentException}
-\index{exception!MissingFormatArgument}
-
-\begin{small}
-\begin{stdout}
-Exception in thread "main" java.util.MissingFormatArgumentException:
-Format specifier '%d'
-    at java.util.Formatter.format(Formatter.java:2519)
-    at java.io.PrintStream.format(PrintStream.java:970)
-    at java.io.PrintStream.printf(PrintStream.java:871)
-    at Example.main(Example.java:10)
-\end{stdout}
-\end{small}
-
-Error messages may seem cryptic, but it's important to read them carefully.
-Starting from the top, this one says ``missing format argument'' and ``format specifier \%d''.
-In order words, it doesn't know what value to substitute for the \%d.
-The bottom of the error indicates where to look: Example.java line 10.
-
-It might be difficult to see what's wrong, given that \java{inch} and \java{cm} are at the end of the \java{printf} statement.
-But if \java{inch} is 1 and \java{cm} is 2.54, the actual format string would be \java{"\%d in = \%f cm\\n12.54"}.
-
-
-%\section{Centimeters to inches}
-\section{Type cast operators}
-
-Now suppose we have a measurement in centimeters, and we want to round it off to the nearest inch.
-It is tempting to write:
-
-\begin{code}
-inch = cm / CM_PER_INCH;  // syntax error
-\end{code}
-
-But the result is an error -- you get something like, ``incompatible types: possible lossy conversion from double to int.''
-The problem is that the value on the right is floating-point, and the variable on the left is an integer.
-
-Java converts an \java{int} to a \java{double} automatically, since no information is lost in the process.
-On the other hand, going from \java{double} to \java{int} would lose the decimal places.
-Java doesn't perform this operation automatically in order to ensure that you are aware of the loss of the fractional part of the number.
-
-\index{type cast}
-\index{operator!cast}
-
-The simplest way to convert a floating-point value to an integer is to use a {\bf type cast}, so called because it molds or ``casts'' a value from one type to another.
-The syntax for type casting is to put the name of the type in parentheses and use it as an operator.
-
-\begin{code}
-double pi = 3.14159;
-int x = (int) pi;
-\end{code}
-
-The \java{(int)} operator has the effect of converting what follows into an integer.
-In this example, \java{x} gets the value \java{3}.
-Like integer division, casting to an integer always rounds toward zero, even if the fraction part is \java{0.999999} (or \java{-0.999999}).
-In other words, it simply throws away the fractional part.
-
-In order to use a cast operator, the types must be compatible.
-For example, you can't cast a \java{String} to an \java{int} because a string is not a number.
-
-\begin{code}
-String str = "3";
-int x = (int) str;  // error: incompatible types
-\end{code}
-
-Type casting takes precedence over arithmetic operations.
-In the following example, the value of \java{pi} gets converted to an integer before the multiplication.
-
-\begin{code}
-double pi = 3.14159;
-double x = (int) pi * 20.0;  // result is 60.0, not 62.0
-\end{code}
-
-%Operator precedence and integer truncation make type casting somewhat error-prone.
-
-Keeping that in mind, here's how we can convert centimeters to inches:
-
-\begin{code}
-inch = (int) (cm / CM_PER_INCH);
-System.out.printf("%f cm = %d in\n", cent, inch);
-\end{code}
-
-The parentheses after the cast operator require the division to happen before the type cast.
-And the result is rounded toward zero.
-We will see in the next chapter how to round floating-point numbers to the closest integer.
-
-
-\section{Remainder operator}
-
-Let's take the example one step further: suppose you have a measurement in inches and you want to convert to feet and inches.
-The goal is divide by 12 (the number of inches in a foot) and keep the remainder.
-
-\index{modulo}
-\index{\% remainder operator}
-\index{operator!remainder}
-\index{remainder}
-
-We have already seen the division operation (\java{/}), which computes the quotient of two numbers.
-If the numbers are integers, it performs integer division.
-Java also provides the {\bf modulo} operation (\java{\%}), which divides two numbers and computes the remainder.
-
-Using division and modulo, we can convert to feet and inches like this:
-
-\begin{code}
-feet = 76 / 12;    // quotient
-inches = 76 % 12;  // remainder
-\end{code}
-
-The first line yields 6.
-The second line, which is pronounced ``76 mod 12'', yields 4.
-So 76 inches is 6 feet, 4 inches.
-
-\index{modulus}
-
-Many people (and textbooks) incorrectly refer to \java{\%} as the ``modulus operator''.
-In mathematics, however, {\bf modulus} is the number you're dividing by.
-In the previous example, the modulus is 12.
-The Java language specification refers to  \java{\%} as the ``remainder operator''.
-
-The remainder operator looks like a percent sign, but you might find it helpful to think of it as a division sign ($\div$) rotated to the left.
-
-%Note that both \java{/} and \java{\%} perform {\em integer division}, so the result always rounds down.
-%The reason why integer division ``rounds down'' is that the hardware computes the quotient and remainder separately.
-
-\index{divisible}
-\index{extract digits}
-
-Modular arithmetic turns out to be surprisingly useful.
-For example, you can check whether one number is divisible by another: if \java{x \% y} is zero, then \java{x} is divisible by \java{y}.
-You can use remainder to ``extract'' digits from a number: \java{x \% 10} yields the rightmost digit of \java{x}, and \java{x \% 100} yields the last two digits.
-And many encryption algorithms use the remainder operator extensively.
-
-
-\section{Putting it all together}
-
-At this point, you have seen enough Java to write useful programs that solve everyday problems.
-You can (1) import Java library classes, (2) create a \java{Scanner}, (3) get input from the keyboard, (4) format output with \java{printf}, and (5) divide and mod integers.
-Now we will put everything together in a complete program:
-
-%Since we've looked at each of these topics in isolation, it's important to see how they fit together in a complete program.
-%If you've been working through the examples on your computer as you've been reading (like we recommended in Section~\ref{sec:examples}), then good job!
+Here is a simple interactive program which converts centimeters to feet and inches:
 
 \index{Convert.java}
 
@@ -550,7 +307,7 @@ The reader should never have to scroll horizontally.
 
 
 \section{The Scanner bug}
-
+\label{mutablescanner}
 Now that you've had some experience with \java{Scanner}, there is an unexpected behavior we want to warn you about.
 The following code fragment asks users for their name and age:
 
@@ -629,6 +386,254 @@ System.out.printf("Hello %s, age %d\n", name, age);
 This technique is common when reading \java{int} or \java{double} values that appear on their own line.
 First you read the number, and then you read the rest of the line, which is just a newline character.
 
+\section{Validating input}
+\label{validate}
+
+\index{validate}
+\index{hacker}
+
+One of the most important tasks in any computer program is to {\bf validate} input from the user.
+People often make mistakes while typing, especially on smartphones, and incorrect inputs may cause your program to fail.
+
+Even worse, someone (i.e., a {\bf hacker}) may intentionally try to break into your system by entering unexpected inputs.
+You should never assume that users will input the right kind of data.
+
+Consider this simple program that prompts the user for a number and computes its logarithm:
+
+\begin{code}
+	Scanner in = new Scanner(System.in);
+	System.out.print("Enter a number: ");
+	double x = in.nextDouble();
+	double y = Math.log(x);
+	System.out.println("The log is " + y);
+\end{code}
+
+In mathematics, the natural logarithm (base $e$) is undefined when $x < 0$.
+If you ask for \java{Math.log(-1)}, it will return {\bf NaN} which stands for ``not a number''.
+Many users are confused when they see NaN; it often looks like a bug.
+We can use an \java{if} statement to make the output more user friendly.
+
+\begin{code}
+	if (x >= 0) {
+		double y = Math.log(x);
+		System.out.println("The log is " + y);
+	} else {
+		System.out.println("The log is undefined");
+	}
+\end{code}
+
+The output is better now, but there is another problem.
+What if the user doesn't enter a number at all?
+What would happen if they typed the word ``hello'', either on accident or on purpose?
+
+\index{InputMismatchException}
+\index{exception!InputMismatch}
+
+\begin{small}
+	\begin{stdout}
+		Exception in thread "main" java.util.InputMismatchException
+		at java.util.Scanner.throwFor(Scanner.java:864)
+		at java.util.Scanner.next(Scanner.java:1485)
+		at java.util.Scanner.nextDouble(Scanner.java:2413)
+		at Logarithm.main(Logarithm.java:8)
+	\end{stdout}
+\end{small}
+
+\index{run-time error}
+\index{testing}
+
+If the user inputs a \java{String} when we expect a \java{double}, Java reports an ``input mismatch'' exception.
+We can prevent this run-time error from happening by testing the input first.
+
+The \java{Scanner} class provides \java{hasNextDouble}, which checks whether the next input can be interpreted as a \java{double}.
+If not, we can display an error message.
+
+\begin{code}
+	if (!in.hasNextDouble()) {
+		String word = in.next();
+		System.err.println(word + "is not a number");
+		return;
+	}
+\end{code}
+
+\index{next!Scanner}
+
+In contrast to \java{in.nextLine}, which returns an entire line of input, the \java{in.next} method returns only the next token of input.
+We can use \java{in.next} to show the user exactly which word they typed was not a number.
+
+\index{System.err}
+
+This example also uses \java{System.err}, which is an \java{OutputStream} for error messages and warnings.
+Some development environments display output to \java{System.err} with a different color or in a separate window.
+
+\index{return}
+\index{statement!return}
+
+The \java{return} statement allows you to exit a method before you reach the end of it.
+Returning from \java{main} terminates the program.
+
+Notice the use of the \java{!} operator before \java{in.hasNextDouble()}, instead of testing the condition \java{in.hasNextDouble() == false}.
+Since \java{hasNextDouble} returns a boolean, it is already a condition.
+
+
+\section{Example program}
+
+In this chapter we have seen relational and logical operators, \java{if} statements, the \java{Math} class, and validating input.
+The following program shows how the individual code examples in the last section fit together.
+
+\index{Logarithm.java}
+
+\begin{trinket}{Logarithm.java}
+	import java.util.Scanner;
+	
+	/**
+	* Demonstrates input validation using if statements.
+	*/
+	public class Logarithm {
+		
+		public static void main(String[] args) {
+			
+			// prompt for input
+			Scanner in = new Scanner(System.in);
+			System.out.print("Enter a number: ");
+			
+			// check the format
+			if (!in.hasNextDouble()) {
+				String word = in.next();
+				System.err.println(word + " is not a number");
+				return;
+			}
+			
+			// check the range
+			double x = in.nextDouble();
+			if (x >= 0) {
+				double y = Math.log(x);
+				System.out.println("The log is " + y);
+			} else {
+				System.out.println("The log is undefined");
+			}
+		}
+	}
+\end{trinket}
+
+What started as five lines of code at the beginning of Section~\ref{validate} is now a 30-line program.
+Making programs robust (and secure) often requires a lot of additional checking, as shown in this example.
+
+\section{Creating an interactive game}
+
+We have learned enough to create an interactive game. We'll use a game that doesn't require the computer to have any kind of intelligence, but it will use randomness to create an initial problem to solve.
+
+\subsection{Code guessing game}
+\label{guesscode}
+Let's say you are trying to guess a secret code. The code has $m$ digits. In addition, you know each digit is in the range 1 through $n$. Repeat digits are allowed and the order matters. For example, if $m=4$ and $n=6$, the following are some possible codes: $1234,6666,1122,1212,2211$. Notice that the digit 0 is not allowed in this game.
+
+When you guess a code, you are given some feedback. You are told how many of your digits are {\em perfect}: the number of digits that match in the same position in your guess and the secret code. (If all $m$ of your digits are perfect, you win!) You are also told how many of your digits are {\em close}: the number of digits that are in the secret code and your guess, but in a different position in your guess than in the secret code.
+For example, if the secret code is $1123$ and you guess $2213$, you would be told that one of your digits is perfect and two of your digits are close. (The 3 is in the correct position. One of your 2s matches a 2 in the code, and your 1 matches one of the 1s in the code. Notice that you don't count two matches for your 2s because there is only one 2 in the secret code to match against!)
+
+\subsection{Randomness}
+\label{randomness}
+The \java{Math.random()} method returns a random \java{double} between 0.0 and 1.0. The number can be as small as 0 but it can never quite be 1 (it ends up being about 0.9999999999999999). If we take this number, multiply it by an \java{int} $n$, then cast the result to \java{int}, we end up with an integer in the range $[0,n-1]$ with roughly equal chances for each number. {\em Pay close attention to the use of parentheses below. Without parentheses, \java{Math.random()} would be cast to \java{int} which would always evaluate to 0.}
+
+
+\subsection{Creating a secret code}
+
+We can write a static method to create a secret code as an array of digits.
+\begin{code}
+public static int[] createSecretCode(int length, int range) {
+	int[] code = new int[length];
+	for (int i = 0; i < length; i++) {
+		code[i] = (int)(Math.random() * range) + 1;
+	}
+	return code;
+}
+\end{code}
+
+\subsection{Converting an \java{int} to an array}
+
+It was convenient to work with an array of digits. When a user types an integer as a guess, we want to break it up into an array of digits. The easiest way to do this is to use the remainder operator \java{\%} to get the ones digit and divide to remove the ones digit. However, because the ones digit is the one on the right, we must fill in the array {\em from right to left}.
+
+\begin{code}
+public static int[] guessToArray(int guess, int length, int range) {
+	int[] a = new int[length];
+	for (int i = length-1; i >= 0; i--) {
+		a[i] = guess % 10;
+		if (a[i] < 1 || a[i] > range) {
+			return null; // make sure the digits are not too small or big
+		}
+		guess /= 10; // Divide away the ones digit
+	}
+	if (guess != 0) return null; // make sure the guess matches the length
+	return a;
+}
+\end{code}
+
+\subsection{Comparing a secret code to a guess}
+
+We can write a static method to count the number of perfect digits in a guess, one at a time:
+
+\begin{code}
+public static int countPerfect(int[] secret, int[] guess) {
+	int count = 0;
+	for (int i = 0; i < secret.length; i++) {
+		if (secret[i] == guess[i]) count++;
+	}
+	return count;
+}
+\end{code}
+
+\subsection{Advanced: Close digit method}
+
+In order to count the number of {\em close} digits, we must keep track of which digits have been matched. We can use a boolean array for each digit of the secret code array which tracks whether a secret digit has been matched. We must also keep from matching a guess digit twice and skip any perfect digits.
+
+\begin{code}
+public static int countClose(int[] secret, int[] guess) {
+	boolean[] matched = new boolean[secret.length];
+	int count = 0;
+	for (int i = 0; i < guess.length; i++) {
+		if (guess[i] == secret[i]) continue; // Skip perfect
+		for (int j = 0; j < secret.length; j++) {
+			// Skip matched and perfect digits in secret code
+			if (matched[j] || guess[j] == secret[j]) continue;
+			if (guess[i] == secret[j]]) { // We found a match!
+				matched[j] = true;
+				count++;
+				break; // Prevent multiple matches
+			}
+		}
+	}
+	return count;
+}
+\end{code}
+
+\subsection{Writing an interactive main method}
+
+We can use a Scanner along with the above methods to create an interactive game. Review section~\ref{mutablescanner} for more information on the "Scanner bug".
+
+\begin{code}
+// Make sure your class imports java.util.Scanner.
+public static void main(String[] args) {
+	int length = 4; // 4 digit code
+	int range = 6; // each digit in the range 1-6
+	Scanner s = new Scanner(System.in);
+	int[] secret = createSecretCode(length, range);
+	int[] guess = new int[length];
+	while (countPerfect(secret, guess) != length) {
+		guess = null;
+		while (guess == null) {
+			System.out.print("Please enter a guess (" + length
+				+ " digits in the range 1-"+range+"): ");
+			if (s.hasNextInt()) {
+				guess = guessToArray(s.nextInt(), length, range);
+			}
+			s.nextLine(); // "Scanner bug"
+		}
+		System.out.println("You have " + countPerfect(secret, guess)
+			+ " perfect digit(s) and "+countClose(secret, guess)
+			+ " close digit(s).";
+	}
+	System.out.println("You win!")
+}
+\end{code}
 
 % DW suggests we also cover PrintWriter to write files --
 % add an appendix on File I/O since it involves try/catch?
@@ -636,6 +641,15 @@ First you read the number, and then you read the rest of the line, which is just
 \section{Vocabulary}
 
 \begin{description}
+
+\term{index}
+An integer variable or value used to indicate a character in a string.
+
+\term{Unicode}
+An international standard for representing characters in most of the world's languages.
+
+\term{empty string}
+The string \java{""}, which contains no characters and has a length of zero.
 
 \term{package}
 A directory of classes that are related to each other.
@@ -709,6 +723,9 @@ In Java, it is denoted with a percent sign: \java{5 \% 2} is \java{1}.
 The value of \java{b} in the expression \java{a \% b}.
 It often represents unit conversions, such as 24 hours in a day, 60 minutes in an hour, etc.
 
+\term{NaN}
+A special floating-point value that stands for ``not a number''.
+
 \end{description}
 
 
@@ -721,6 +738,58 @@ Before you start the exercises, we recommend that you compile and run the exampl
 If you have not already read Appendix~\ref{commandline}, now might be a good time.
 It describes the command-line interface, which is a powerful and efficient way to interact with your computer.
 
+\begin{exercise}  %%V6 Ex9.5
+
+\index{abecedarian}
+
+A word is said to be ``abecedarian'' if the letters in the word appear in alphabetical order.
+For example, the following are all six-letter English abecedarian words:
+
+\begin{quote}
+abdest, acknow, acorsy, adempt, adipsy, agnosy, befist, behint, %\\
+beknow, bijoux, biopsy, cestuy, chintz, deflux, dehors, dehort, %\\
+deinos, diluvy, dimpsy %\\
+\end{quote}
+
+Write a method called \java{isAbecedarian} that takes a \java{String} and returns a \java{boolean} indicating whether the word is abecedarian.
+%Your method can be iterative or recursive.
+
+\end{exercise}
+
+
+\begin{exercise}  %%V6 Ex9.8
+
+\index{Scrabble}
+
+In Scrabble\footnote{Scrabble is a registered trademark owned in the USA and Canada by Hasbro Inc., and in the rest of the world by J.\ W.\ Spear \& Sons Limited of Maidenhead, Berkshire, England, a subsidiary of Mattel Inc.} each player has a set of tiles with letters on them.
+The object of the game is to use those letters to spell words.
+The scoring system is complex, but longer words are usually worth more than shorter words.
+
+Imagine you are given your set of tiles as a string, like \java{"quijibo"}, and you are given another string to test, like \java{"jib"}.
+
+Write a method called \java{canSpell} that takes two strings and checks whether the set of tiles can spell the word.
+You might have more than one tile with the same letter, but you can only use each tile once.
+
+\end{exercise}
+
+\begin{exercise}  %%V6 Ex9.2
+	
+	Write a method called \java{letterHist} that takes a string as a parameter and returns a histogram of the letters in the string.
+	The zeroth element of the histogram should contain the number of a's in the string (upper- and lowercase); the 25th element should contain the number of z's.
+	Your solution should only traverse the string once.
+	
+\end{exercise}
+
+
+\begin{exercise}  %%V6 Ex9.7
+	
+	\index{anagram}
+	
+	Two words are anagrams if they contain the same letters and the same number of each letter.
+	For example, ``stop'' is an anagram of ``pots'' and ``allen downey'' is an anagram of ``well annoyed''.
+	Write a method that takes two strings and checks whether they are anagrams of each other.
+	
+\end{exercise}
 
 \begin{exercise}  %%V6 Ex3.1
 
@@ -767,43 +836,40 @@ When it's finished, it will work like this:
 
 \begin{stdout}
 I'm thinking of a number between 1 and 100
-(including both). Can you guess what it is?
+(including both). Can you guess what it is within 8 guesses?
 Type a number: 45
-Your guess is: 45
-The number I was thinking of is: 14
-You were off by: 31
+My number is smaller!
+You have 7 guesses remaining.
+Type a number: six
+You must enter a decimal integer number between 1 and 100.
+Type a number: 6
+My number is larger!
+You have 6 guesses remaining.
+Type a number: 14
+You guessed my number!
 \end{stdout}
-
-To choose a random number, you can use the \java{Random} class in \java{java.util}.
-Here's how it works:
-
-\index{GuessStarter.java}
-
-\begin{trinket}{GuessStarter.java}
-import java.util.Random;
-
-public class GuessStarter {
-
-    public static void main(String[] args) {
-        // pick a random number
-        Random random = new Random();
-        int number = random.nextInt(100) + 1;
-        System.out.println(number);
-    }
-}
-\end{trinket}
 
 \index{new}
 \index{operator!new}
 
-Like the \java{Scanner} class we saw in this chapter, \java{Random} has to be imported before we can use it.
-And as we saw with \java{Scanner}, we have to use the \java{new} operator to create a \java{Random} (number generator).
-
-Then we can use the method \java{nextInt} to generate a random number.
-In this example, the result of \java{nextInt(100)} will be between 0 and 99, including both.
-Adding 1 yields a number between 1 and 100, including both.
-
 \begin{enumerate}
+
+\item Start with the following code. Refer to section~\ref{randomness} for more information on randomness.
+
+\index{GuessStarter.java}
+\label{guessstarter}
+
+\begin{trinket}{GuessStarter.java}
+	
+	public class GuessStarter {		
+		public static void main(String[] args) {
+			// pick a random number
+			int number = (int)(Math.random() * 100) + 1;
+			System.out.println(number);
+		}
+	}
+\end{trinket}
+
 
 \item The definition of \java{GuessStarter} is in a file called {\tt GuessStarter.java}, in the directory called {\tt ch03}, in the repository for this book.
 %Instructions for downloading this code are on page~\pageref{code}.
@@ -813,10 +879,16 @@ Adding 1 yields a number between 1 and 100, including both.
 \item Modify the program to prompt the user, then use a \java{Scanner} to read a line of user input.
 Compile and test the program.
 
-\item Read the user input as an integer and display the result.
-Again, compile and test.
+\item Read the user input as an integer and compute and display whether the user's guess is greater than, less than, or equal to the number that was generated.
 
-\item Compute and display the difference between the user's guess and the number that was generated.
+\item Prevent the user from typing a guess which is out of range or not an integer. Use the technique we learned from the code guessing game in section~\ref{guesscode}
+
+\item Use a loop to allow the user to make multiple guesses and track the remaining guesses. Exit the loop if the user guesses correctly. If the user doesn't guess the number, print the following message:
+\begin{stdout}
+The number I was thinking of is: 14
+Better luck next time.	
+\end{stdout}
+
 
 \end{enumerate}
 

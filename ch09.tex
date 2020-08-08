@@ -1,10 +1,12 @@
-\chapter{Immutable objects}
+\chapter{Working with Strings and immutable objects}
 \label{immutable}
 
 \index{object-oriented}
 
 Java is an ``object-oriented'' language, which means that it uses objects to represent data {\em and} provide methods related to them.
 This way of organizing programs is a powerful design concept, and we will introduce it gradually throughout the remainder of the book.
+
+This chapter introduces some of the mechanics of working with objects. It focuses on {\bf immutable} objects, which cannot change state.
 
 \index{object}
 \index{System.in}
@@ -18,6 +20,357 @@ Strings are objects, too.
 They contain characters and provide methods for manipulating character data.
 Other data types, like \java{Integer}, contain numbers and provide methods for manipulating number data.
 We will explore some of those methods in this chapter.
+
+\section{String iteration}
+
+\index{iteration}
+
+The following loop iterates the characters in \java{fruit} and displays them, one on each line:
+
+\begin{code}
+	for (int i = 0; i < fruit.length(); i++) {
+		char letter = fruit.charAt(i);
+		System.out.println(letter);
+	}
+\end{code}
+
+\index{string!length}
+\index{length!string}
+
+Strings provide a method called \java{length} that returns the number of characters in the string.
+Because it is a method, you have to invoke it with the empty argument list, \java{()}.
+When \java{i} is equal to the length of the string, the condition becomes \java{false} and the loop terminates.
+
+To find the last letter of a string, you might be tempted to do something like:
+
+\begin{code}
+	int length = fruit.length();
+	char last = fruit.charAt(length);      // wrong!
+\end{code}
+
+\index{StringIndexOutOfBoundsException}
+\index{exception!StringIndexOutOfBounds}
+
+This code compiles and runs, but invoking the \java{charAt} method throws a \\ \java{StringIndexOutOfBoundsException}.
+The problem is that there is no sixth letter in \java{"banana"}.
+Since we started counting at 0, the 6 letters are indexed from 0 to 5.
+To get the last character, you have to subtract 1 from \java{length}.
+
+\begin{code}
+	int length = fruit.length();
+	char last = fruit.charAt(length - 1);  // correct
+\end{code}
+
+Many string algorithms involve reading one string and building another.
+For example, to reverse a string, we can add one character at a time:
+
+\begin{code}
+	public static String reverse(String s) {
+		String r = "";
+		for (int i = s.length() - 1; i >= 0; i--) {
+			r += s.charAt(i);
+		}
+		return r;
+	}
+\end{code}
+
+\index{empty string}
+
+The initial value of \java{r} is \java{""}, which is the {\bf empty string}.
+The loop iterates the letters of \java{s} in reverse order.
+Each time through the loop, it creates a new string and assigns it to \java{r}.
+When the loop exits, \java{r} contains the letters from \java{s} in reverse order.
+So the result of \java{reverse("banana")} is \java{"ananab"}.
+
+
+\section{The indexOf method}
+
+\index{indexOf}
+
+To search for a specific character in a string, you could write a \java{for} loop and use \java{charAt} like in the previous section.
+However, the \java{String} class already provides a method for doing just that.
+
+\begin{code}
+	String fruit = "banana";
+	int index = fruit.indexOf('a');     // returns 1
+\end{code}
+
+This example finds the index of \java{'a'} in the string.
+But the letter appears three times, so it's not obvious what \java{indexOf} should do.
+According to the documentation, it returns the index of the {\em first} appearance.
+
+To find subsequent appearances, you can use another version of \java{indexOf}, which takes a second argument that indicates where in the string to start looking.
+
+\begin{code}
+	int index = fruit.indexOf('a', 2);  // returns 3
+\end{code}
+
+To visualize how \java{indexOf} and other \java{String} methods work, it helps to draw a picture like Figure~\ref{fig.banana}.
+The previous code starts at index 2 (the first \java{'n'}) and finds the next \java{'a'}, which is at index 3.
+
+\index{memory diagram}
+\index{diagram!memory}
+
+\begin{figure}[!ht]
+	\begin{center}
+		\includegraphics{figs/banana.pdf}
+		\caption{Memory diagram for a \java{String} of six characters.}
+		\label{fig.banana}
+	\end{center}
+\end{figure}
+
+%\begin{center}
+%\begin{tabular}{c|c|c|c|c|c}
+%%\hline
+%b & a & n & a & n & a \\
+%\hline
+%0 & 1 & 2 & 3 & 4 & 5 \\
+%%\hline
+%\end{tabular}
+%\end{center}
+
+If the character happens to appear at the starting index, the starting index is the answer.
+So \java{fruit.indexOf('a', 5)} returns \java{5}.
+If the character does not appear in the string, \java{indexOf} returns \java{-1}.
+Since indexes cannot be negative, this value indicates the character was not found.
+
+You can also use \java{indexOf} to search for an entire string, not just a single character.
+For example, the expression \java{fruit.indexOf("nan")} returns \java{2}.
+
+\section{Counting characters}
+
+A word is said to be a ``doubloon'' if every letter that appears in the word appears exactly twice.
+Here are some example doubloons found in the dictionary:
+
+\begin{quote}
+	Abba, Anna, appall, appearer, appeases, arraigning, beriberi, bilabial, Caucasus, coco, Dada, deed, Emmett, Hannah, horseshoer, intestines, Isis, mama, Mimi, murmur, noon, Otto, papa, peep, reappear, redder, sees, Toto
+\end{quote}
+
+We will write a method called \java{isDoubloon} that takes a string and checks whether it is a doubloon.
+(To ignore case, we would invoke the \java{toLowerCase} method before checking.)
+
+One algorithm is to loop through the string 26 times, once for each lowercase letter:
+
+\begin{code}
+	for (char c = 'a'; c <= 'z'; c++) {
+		// count how many times the letter appears
+		// if the count is not 0 or 2, return false
+	}
+\end{code}
+
+This ``nested loops'' approach is inefficient, especially when the string is long (e.g., one billion characters).
+Another algorithm would initialize 26 variables to zero, loop through the string once, and use a giant \java{if} statement update the variable for each letter.
+But who wants to declare 26 variables?
+
+That's where arrays come in.
+We can declare a single variable that stores 26 integers.
+Rather than use an \java{if} statement to update each value, we can use arithmetic to update the $n$th value directly.
+
+Based on the approach from Section~\ref{singlepass}, we will create an array of 26 integers to count how many times each letter appears.
+We convert the string to lowercase, so that we can treat \java{'A'} and \java{'a'} (for example) as the same latter.
+
+\begin{code}
+	int[] counts = new int[26];
+	String lower = s.toLowerCase();
+\end{code}
+
+We can use a \java{for} loop to iterate each character in the string.
+To update the \java{counts} array, we need to compute the index that corresponds to each character.
+Fortunately, Java allows you to perform arithmetic on characters.
+
+\begin{code}
+	for (int i = 0; i < lower.length(); i++) {
+		char letter = lower.charAt(i);
+		int index = letter - 'a';
+		counts[index]++;
+	}
+\end{code}
+
+\index{toCharArray}
+
+To simplify the code, it would be nice to use an enhanced \java{for} loop.
+The enhanced \java{for} loop does not work with strings directly, but you can convert any string to a character array and iterate that instead:
+
+\begin{code}
+	for (char letter : lower.toCharArray()) {
+		int index = letter - 'a';
+		counts[index]++;
+	}
+\end{code}
+
+After counting all the characters in the \java{lower} string, we need one last \java{for} loop to determine whether each letter appears 0 or 2 times.
+
+\begin{code}
+	for (int count : counts) {
+		if (count != 0 && count != 2) {
+			return false;  // not a doubloon
+		}
+	}
+	return true;  // is a doubloon
+\end{code}
+
+Like in Section~\ref{traversal}, we can return immediately if the inner condition is true (which, in this example, means that the word is not a doubloon).
+If we make it all the way through the \java{for} loop, we know that all counts are 0 or 2.
+
+\begin{code}
+	public static boolean isDoubloon(String s) {
+		// count the number of times each letter appears
+		int[] counts = new int[26];
+		String lower = s.toLowerCase();
+		for (char letter : lower.toCharArray()) {
+			int index = letter - 'a';
+			counts[index]++;
+		}
+		// determine whether the given word is a doubloon
+		for (int count : counts) {
+			if (count != 0 && count != 2) {
+				return false;
+			}
+		}
+		return true;
+	}
+\end{code}
+
+And some test code:
+
+\begin{code}
+	public static void main(String[] args) {
+		System.out.println(isDoubloon("Mama"));  // true
+		System.out.println(isDoubloon("Lama"));  // false
+	}
+\end{code}
+
+
+\section{String comparison}
+\label{strcmp}
+
+\index{equals}
+\index{string!comparing}
+
+To compare two strings, it may be tempting to use the \java{==} and \java{!=} operators.
+
+\begin{code}
+	String name1 = "Alan Turing";
+	String name2 = "Ada Lovelace";
+	if (name1 == name2) {                 // wrong!
+		System.out.println("The names are the same.");
+	}
+\end{code}
+
+This code compiles and runs, and sometimes it gets the answer right.
+But sometimes it gets the answer wrong.
+If you give it two different strings that contain the same letters, the condition will be \java{false}.
+
+The problem is that the \java{==} operator checks whether the two variables refer to the {\em same object} by comparing the references.
+We'll learn more about references in the next chapter.
+The correct way to compare strings is with the \java{equals} method, like this:
+
+\begin{code}
+	if (name1.equals(name2)) {
+		System.out.println("The names are the same.");
+	}
+\end{code}
+
+This example invokes \java{equals} on \java{name1} and passes \java{name2} as an argument.
+The \java{equals} method returns \java{true} if the strings contain the same characters; otherwise it returns \java{false}.
+
+\index{compareTo}
+
+If the strings differ, we can use \java{compareTo} to see which comes first in alphabetical order:
+
+\begin{code}
+	int diff = name1.compareTo(name2);
+	if (diff == 0) {
+		System.out.println("The names are the same.");
+	} else if (diff < 0) {
+		System.out.println("name1 comes before name2.");
+	} else if (diff > 0) {
+		System.out.println("name2 comes before name1.");
+	}
+\end{code}
+
+The return value from \java{compareTo} is the difference between the first characters in the strings that are not the same.
+In the preceding code, \java{compareTo} returns positive 8, because the second letter of \java{"Ada"} comes before the second letter of \java{"Alan"} by 8 letters.
+
+If the strings are equal, their difference is zero.
+If the first string (the one on which the method is invoked) comes first in the alphabet, the difference is negative.
+Otherwise, the difference is positive.
+
+\index{case-sensitive}
+
+Both \java{equals} and \java{compareTo} are case-sensitive.
+In Unicode, uppercase letters come before lowercase letters.
+So \java{"Ada"} comes before \java{"ada"}.
+
+
+\section{Substrings}
+
+\index{substring}
+
+The \java{substring} method returns a new string that copies letters from an existing string, starting at the given index.
+
+\begin{itemize}
+	\item \java{fruit.substring(0)} returns \java{"banana"}
+	\item \java{fruit.substring(2)} returns \java{"nana"}
+	\item \java{fruit.substring(6)} returns \java{""}
+\end{itemize}
+
+The first example returns a copy of the entire string.
+The second example returns all but the first two characters.
+As the last example shows, \java{substring} returns the empty string if the argument is the length of the string.
+
+Like most string methods, \java{substring} is overloaded.
+That is, there are other versions of \java{substring} that have different parameters.
+If it's invoked with two arguments, they are treated as a start and end index:
+
+\begin{itemize}
+	\item \java{fruit.substring(0, 3)} returns \java{"ban"}
+	\item \java{fruit.substring(2, 5)} returns \java{"nan"}
+	\item \java{fruit.substring(6, 6)} returns \java{""}
+\end{itemize}
+
+Notice that the character indicated by the end index is {\em not} included.
+Defining \java{substring} this way simplifies some common operations.
+For example, to select a substring with length \java{len}, starting at index \java{i}, you could write \java{fruit.substring(i, i + len)}.
+%So \java{fruit.substring(2, 2 + 3)} returns \java{"nan"}.
+
+
+\section{String formatting}
+
+\index{printf}
+
+In Section~\ref{printf}, we learned how to use \java{System.out.printf} to display formatted output.
+Sometimes programs need to create strings that are formatted a certain way, but not display them immediately, or ever.
+For example, the following method returns a time string in 12-hour format:
+
+\begin{code}
+	public static String timeString(int hour, int minute) {
+		String ampm;
+		if (hour < 12) {
+			ampm = "AM";
+			if (hour == 0) {
+				hour = 12;  // midnight
+			}
+		} else {
+			ampm = "PM";
+			hour = hour - 12;
+		}
+		return String.format("%02d:%02d %s", hour, minute, ampm);
+	}
+\end{code}
+
+\index{string!format}
+
+\java{String.format} takes the same arguments as \java{System.out.printf}: a format specifier followed by a sequence of values.
+The main difference is that \java{System.out.printf} displays the result on the screen.
+\java{String.format} creates a new string, but does not display anything.
+
+In this example, the format specifier \java{\%02d} means ``two digit integer padded with zeros'', so \java{timeString(19, 5)} returns the string \java{"07:05 PM"}.
+As an exercise, try writing two nested \java{for} loops (in \java{main}) that invoke \java{timeString} and display all possible times over a 24-hour period.
+
+At some point today, skim through the documentation for \java{String}.
+Knowing what other methods are there will help you avoid reinventing the wheel.
+The easiest way to find documentation for Java classes is to do a web search for ``Java'' and the name of the class.
 
 
 \section{Primitives vs objects}
@@ -140,7 +493,9 @@ For example, the methods \java{toLowerCase} and \java{toUpperCase} convert upper
 These methods are often a source of confusion, because it sounds like they modify strings.
 But neither these methods nor any others can change a string, because strings are {\bf immutable}.
 
-When you invoke \java{toUpperCase} on a string, you get another \java{String} object as a result.
+Believe it or not, immutability is already a familiar concept to you. Consider the number 5. You may use this number to describe a quantity that can change, such as the number of words in an editable document. But it doesn't make sense to be able change the number 5 itself to mean ``six things''. Like the childhood game of ``opposite day'' where every word now means its opposite, changing an immutable constant like 5 would break many assumptions and drive everyone crazy!
+
+Instead of changing the string, when you invoke \java{toUpperCase} on a string, you get another \java{String} object as a result.
 For example:
 
 \begin{code}
@@ -169,6 +524,27 @@ name = name.toUpperCase();    // references the new string
 System.out.println(name);
 \end{code}
 
+Here is one more demonstration of references and immutability. Consider the following class:
+
+\begin{code}
+public class ImmutableDemo {
+	public static void makeUpperCase(String name) {
+		name = name.toUpperCase();
+	}
+	
+	public static void main(String[] args) {
+		String name = "Alan Turing";
+		makeUpperCase(name);
+		System.out.println(name); // What does this print?
+	}
+}
+\end{code}
+
+When the above \java{main} method is run, a reference to the \java{name} variable is passed to the \java{makeUpperCase} method. That method has its own parameter variable named \java{name}. Both variables refer to the same underlying String object. But when the \java{makeUpperCase} method's \java{name} variable is modified, it does not modify the \java{main} method's \java{name} variable. And as we know, the \java{toUpperCase} method does not modify the underlying String object because Strings are immutable.
+
+Stay tuned! In section~\ref{args}, we'll finally learn about the \java{args} parameter.
+
+
 \index{replace}
 
 A similar method is \java{replace}, which finds and replaces instances of one string within another.
@@ -189,8 +565,8 @@ If you don't assign the return value, invoking \java{text.replace} has no effect
 % ABD: Too many new ideas here: the most important one is that you have to do something with the return value. It's not a good time to appreciate the glory of immutability.
 % CSM: Now that strings were introduced previously, I would like to make this chapter say more about immutability. But we won't get to the full glory until the next chapter.
 
-Strings are immutable by design, because it simplifies passing them between methods as parameters and return values.
-And since the contents of a string can never change, two variables can reference the same string without one accidentally corrupting the other.
+\subsection{Why are Strings immutable?}
+In some programming languages, strings can be modified. But by making \java{String} immutable in Java, the same object can be reused to represent the same information, saving memory. In addition, when we learn about creating our own classes, we will see that making \java{String} immutable aids in the protection of data integrity and reliability. If someone else gives your code a String object, you can use that String object with certainty that the other code will not change it while you are using it!
 
 
 \section{Wrapper classes}
@@ -274,7 +650,7 @@ int num = Integer.parseInt(str);  // NumberFormatException
 
 
 \section{Command-line arguments}
-
+\label{args}
 \index{args}
 \index{command-line interface}
 

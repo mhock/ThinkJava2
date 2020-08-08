@@ -19,39 +19,17 @@ Finally, we'll discuss strategies for incrementally developing and testing your 
 The Java library includes a \java{Math} class that provides common mathematical operations.
 \java{Math} is in the \java{java.lang} package, so you don't have to import it.
 
-\begin{code}
-double root = Math.sqrt(17.0);
-double angle = 1.5;
-double height = Math.sin(angle);
-\end{code}
-
-The first line sets \java{root} to the square root of 17.
-The third line finds the sine of 1.5 (the value of \java{angle}).
-
-\index{degrees}
-\index{radians}
-\index{pi}
-
-Values for the trigonometric functions -- \java{sin}, \java{cos}, and \java{tan} -- must be in {\em radians}.
-To convert from degrees to radians, you can divide by 180 and multiply by $\pi$.
 Conveniently, the \java{Math} class provides a constant double named \java{PI} that contains an approximation of $\pi$:
 
 \begin{code}
-double degrees = 90;
-double angle = degrees / 180.0 * Math.PI;
+	double root = Math.sqrt(17.0);
+	double radius = 1.5;
+	double circleArea = Math.PI * radius * radius;
 \end{code}
 
-Notice that \java{PI} is in capital letters.
-Java does not recognize \java{Pi}, \java{pi}, or \java{pie}.
-Also, \java{PI} is the name of a variable, not a method, so it doesn't have parentheses.
-The same is true for the constant \java{Math.E}, which approximates Euler's number.
+The first line sets \java{root} to the square root of 17.
+The third line finds the area of a circle by multiplying $\pi$ by the square of 1.5 (the value of \java{radius}).
 
-Converting to and from radians is a common operation, so the \java{Math} class provides methods that do that for you.
-
-\begin{code}
-double radians = Math.toRadians(180.0);
-double degrees = Math.toDegrees(Math.PI);
-\end{code}
 
 \index{long}
 \index{type!long}
@@ -60,7 +38,7 @@ Another useful method is \java{round}, which rounds a floating-point value to th
 The following result is 63 (rounded up from 62.8319).
 
 \begin{code}
-long x = Math.round(Math.PI * 20.0);
+	long x = Math.round(Math.PI * 20.0);
 \end{code}
 
 A \java{long} is like an \java{int}, but bigger.
@@ -70,18 +48,17 @@ A \java{long} uses 64 bits, so the largest value is $2^{63}-1$, which is about 9
 Take a minute to read the documentation for these and other methods in the \java{Math} class.
 The easiest way to find documentation for Java classes is to do a web search for ``Java'' and the name of the class.
 
-
 \section{Composition}
 
 \index{expression}
 \index{argument}
 
-You have probably learned to evaluate simple expressions like $\sin(\pi/2)$ and $\log(1/x)$.
+You have probably learned to evaluate simple expressions like $(\pi/2)$ and $\log(1/x)$.
 First, you evaluate the expression in parentheses, which is called the {\bf argument} of the function.
 Then you can evaluate the function itself, either by hand or by punching it into a calculator.
 
-This process can be applied repeatedly to evaluate more complex expressions like $\log(1/\sin(\pi/2))$.
-First we evaluate the argument of the innermost function ($\pi/2 = 1.57$), then evaluate the function itself ($\sin(1.57) = 1.0$), and so on.
+This process can be applied repeatedly to evaluate more complex expressions like $f(\ln(1/(\pi/2)))$.
+First we evaluate the argument of the innermost function ($1/(\pi/2) \simeq 0.6366$), then evaluate the function itself ($\log(0.6366) \simeq -0.1961$), and so on.
 
 \index{composition}
 \index{expression}
@@ -91,10 +68,10 @@ That means you can use one method as part of another.
 In fact, you can use any expression as an argument to a method, as long as the resulting value has the correct type:
 
 \begin{code}
-double x = Math.cos(angle + Math.PI / 2.0);
+	double x = Math.abs(z + Math.PI / 2.0);
 \end{code}
 
-This statement divides \java{Math.PI} by two, adds the result to \java{angle}, and computes the cosine of the sum.
+This statement divides \java{Math.PI} by two, adds the result to \java{z}, and computes the absolute value of the sum.
 You can also take the result of one method and pass it as an argument to another:
 
 \begin{code}
@@ -749,6 +726,33 @@ A placeholder for an incomplete method so that the class will compile.
 Code that is used during program development but is not part of the final version.
 
 \end{description}
+
+
+\section{Optional material: Trigonometry}
+
+\index{degrees}
+\index{radians}
+\index{pi}
+
+Values for the trigonometric functions -- \java{sin}, \java{cos}, and \java{tan} -- must be in {\em radians}.
+To convert from degrees to radians, you can divide by 180 and multiply by $\pi$.
+
+\begin{code}
+	double degrees = 90;
+	double angle = degrees / 180.0 * Math.PI;
+\end{code}
+
+Notice that \java{PI} is in capital letters.
+Java does not recognize \java{Pi}, \java{pi}, or \java{pie}.
+Also, \java{PI} is the name of a variable, not a method, so it doesn't have parentheses.
+The same is true for the constant \java{Math.E}, which approximates Euler's number.
+
+Converting to and from radians is a common operation, so the \java{Math} class provides methods that do that for you.
+
+\begin{code}
+	double radians = Math.toRadians(180.0);
+	double degrees = Math.toDegrees(Math.PI);
+\end{code}
 
 
 \section{Exercises}

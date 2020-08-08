@@ -1,28 +1,9 @@
 \chapter{Arrays and references}
+\label{arrays}
 
 Up to this point, the only variables we have used were for individual values such as numbers or strings.
 In this chapter, we'll learn how to store multiple values of the same type using a single variable.
 This language feature will enable you to write programs that manipulate larger amounts of data.
-
-For example, Exercise~\ref{doubloon} asked you to check whether every letter in a string appears exactly twice.
-One algorithm (which hopefully you already discovered) is to loop through the string 26 times, once for each lowercase letter:
-
-\begin{code}
-for (char c = 'a'; c <= 'z'; c++) {
-    // count how many times the letter appears
-    // if the count is not 0 or 2, return false
-}
-\end{code}
-
-This ``nested loops'' approach is inefficient, especially when the string is long (e.g., one billion characters).
-Another algorithm would initialize 26 variables to zero, loop through the string once, and use a giant \java{if} statement update the variable for each letter.
-But who wants to declare 26 variables?
-
-That's where arrays come in.
-We can declare a single variable that stores 26 integers.
-Rather than use an \java{if} statement to update each value, we can use arithmetic to update the $n$th value directly.
-We will present this algorithm at the end of the chapter.
-
 
 \section{Creating arrays}
 
@@ -111,7 +92,7 @@ The \java{[]} operator selects elements from an array:
 System.out.println("The zeroth element is " + counts[0]);
 \end{code}
 
-You can use the \java{[]} operator anywhere in an expression:
+You can use the \java{[]} operator anywhere in an expression to access or modify the contents of the array:
 
 \begin{code}
 counts[0] = 7;
@@ -601,98 +582,6 @@ for (double d : array) {
 }
 \end{code}
 
-
-\section{Counting characters}
-
-We now return to the example from the beginning of the chapter and present a solution to Exercise~\ref{doubloon} using arrays.
-Here is the problem again:
-
-\begin{quote}
-A word is said to be a ``doubloon'' if every letter that appears in the word appears exactly twice.
-Write a method called \java{isDoubloon} that takes a string and checks whether it is a doubloon.
-To ignore case, invoke the \java{toLowerCase} method before checking.
-\end{quote}
-
-Based on the approach from Section~\ref{singlepass}, we will create an array of 26 integers to count how many times each letter appears.
-We convert the string to lowercase, so that we can treat \java{'A'} and \java{'a'} (for example) as the same latter.
-
-\begin{code}
-int[] counts = new int[26];
-String lower = s.toLowerCase();
-\end{code}
-
-We can use a \java{for} loop to iterate each character in the string.
-To update the \java{counts} array, we need to compute the index that corresponds to each character.
-Fortunately, Java allows you to perform arithmetic on characters.
-
-\begin{code}
-for (int i = 0; i < lower.length(); i++) {
-    char letter = lower.charAt(i);
-    int index = letter - 'a';
-    counts[index]++;
-}
-\end{code}
-
-\index{toCharArray}
-
-To simplify the code, it would be nice to use an enhanced \java{for} loop.
-The enhanced \java{for} loop does not work with strings directly, but you can convert any string to a character array and iterate that instead:
-
-\begin{code}
-for (char letter : lower.toCharArray()) {
-    int index = letter - 'a';
-    counts[index]++;
-}
-\end{code}
-
-After counting all the characters in the \java{lower} string, we need one last \java{for} loop to determine whether each letter appears 0 or 2 times.
-
-\begin{code}
-for (int count : counts) {
-    if (count != 0 && count != 2) {
-        return false;  // not a doubloon
-    }
-}
-return true;  // is a doubloon
-\end{code}
-
-Like in Section~\ref{traversal}, we can return immediately if the inner condition is true (which, in this example, means that the word is not a doubloon).
-If we make it all the way through the \java{for} loop, we know that all counts are 0 or 2.
-
-Pulling together the code fragments, and adding some comments and test cases, here is an entire program.
-%This example uses \java{if} statements, \java{for} loops, methods, strings, and arrays.
-It's amazing to think about how much you've learned in just seven chapters!
-
-\index{Doubloon.java}
-
-\begin{trinket}{Doubloon.java}
-public class Doubloon {
-
-    public static boolean isDoubloon(String s) {
-        // count the number of times each letter appears
-        int[] counts = new int[26];
-        String lower = s.toLowerCase();
-        for (char letter : lower.toCharArray()) {
-            int index = letter - 'a';
-            counts[index]++;
-        }
-        // determine whether the given word is a doubloon
-        for (int count : counts) {
-            if (count != 0 && count != 2) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    public static void main(String[] args) {
-        System.out.println(isDoubloon("Mama"));  // true
-        System.out.println(isDoubloon("Lama"));  // false
-    }
-}
-\end{trinket}
-
-
 \section{Vocabulary}
 
 \begin{description}
@@ -881,22 +770,3 @@ Write a method named \java{arePrimeFactors} that takes an integer \java{n} and a
 
 \end{exercise}
 
-
-\begin{exercise}  %%V6 Ex9.2
-
-Write a method called \java{letterHist} that takes a string as a parameter and returns a histogram of the letters in the string.
-The zeroth element of the histogram should contain the number of a's in the string (upper- and lowercase); the 25th element should contain the number of z's.
-Your solution should only traverse the string once.
-
-\end{exercise}
-
-
-\begin{exercise}  %%V6 Ex9.7
-
-\index{anagram}
-
-Two words are anagrams if they contain the same letters and the same number of each letter.
-For example, ``stop'' is an anagram of ``pots'' and ``allen downey'' is an anagram of ``well annoyed''.
-Write a method that takes two strings and checks whether they are anagrams of each other.
-
-\end{exercise}

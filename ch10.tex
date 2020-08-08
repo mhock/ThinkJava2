@@ -1,4 +1,4 @@
-\chapter{Mutable objects}
+\chapter{Working with mutable objects}
 \label{mutable}
 
 \index{String class}
@@ -7,11 +7,15 @@
 As you learned in the previous chapter, an object is a collection of data that provides a set of methods.
 For example, a \java{String} is a collection of characters that provides methods like \java{charAt} and \java{substring}.
 
-In this chapter, we'll explore two new types of objects: \java{Point} and \java{Rectangle}.
+In this chapter, we will explore objects whose data can change, known as {\bf mutable} objects. We'll explore two new types of objects: \java{Point} and \java{Rectangle}.
 We'll see how to write methods that take objects as parameters and produce objects as return values.
 
 We will also take a first look at the source code for the Java library.
 
+\section{Review: Scanner and array objects}
+It turns out we've already worked with a mutable object: \java{Scanner}. Every time we call the \java{.next()} method, the \java{Scanner} advances its position in the input stream. Review Chapter~\ref{mutablescanner} for more information.
+
+In addition, arrays are objects and the contents of them can be modified using the \java{[]} operator. Review Chapter~\ref{arrays} as needed.
 
 \section{Point objects}
 \label{point}
@@ -354,7 +358,7 @@ Thus, the value displayed by the third line is {\tt 200}, the width of the expan
 \index{library}
 \index{source code}
 
-Throughout the book, you have used classes from the Java library including \java{System}, \java{String}, \java{Scanner}, \java{Math}, \java{Random}, and others.
+Throughout the book, you have used classes from the Java library including \java{System}, \java{String}, \java{Scanner}, \java{Math}, \java{Ranomdom}, and others.
 You may not have realized that these classes are written in Java.
 In fact, you can take a look at the source code to see how they work.
 
